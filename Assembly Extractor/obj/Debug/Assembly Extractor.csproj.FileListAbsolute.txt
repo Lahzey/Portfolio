@@ -1,0 +1,12 @@
+C:\Users\Arno\source\repos\BTD6Mods\Etienne Rework\bin\Debug\Etienne Rework.dll
+C:\Users\Arno\source\repos\BTD6Mods\Etienne Rework\bin\Debug\Etienne Rework.pdb
+C:\Users\Arno\source\repos\BTD6Mods\Etienne Rework\obj\Debug\Assembly Extractor.csprojAssemblyReference.cache
+C:\Users\Arno\source\repos\BTD6Mods\Etienne Rework\obj\Debug\Assembly Extractor.csproj.CoreCompileInputs.cache
+C:\Users\Arno\source\repos\BTD6Mods\Etienne Rework\obj\Debug\Etienne Rework.dll
+C:\Users\Arno\source\repos\BTD6Mods\Etienne Rework\obj\Debug\Etienne Rework.pdb
+C:\Users\Arno\source\repos\BTD6Mods\Assembly Extractor\bin\Debug\Assembly Extractor.dll
+C:\Users\Arno\source\repos\BTD6Mods\Assembly Extractor\bin\Debug\Assembly Extractor.pdb
+C:\Users\Arno\source\repos\BTD6Mods\Assembly Extractor\obj\Debug\Assembly Extractor.csprojAssemblyReference.cache
+C:\Users\Arno\source\repos\BTD6Mods\Assembly Extractor\obj\Debug\Assembly Extractor.csproj.CoreCompileInputs.cache
+C:\Users\Arno\source\repos\BTD6Mods\Assembly Extractor\obj\Debug\Assembly Extractor.dll
+C:\Users\Arno\source\repos\BTD6Mods\Assembly Extractor\obj\Debug\Assembly Extractor.pdb
