@@ -1,0 +1,47 @@
+package poopgame.desktop;
+
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+import poopgame.gamelogic.PoopGame;
+import poopgame.ui.InGameStage;
+
+public class GdxWrapper implements ApplicationListener {
+
+	public static InGameStage IN_GAME_STAGE;
+	
+	@Override
+	public void create() {
+		IN_GAME_STAGE = new InGameStage();
+	}
+
+	@Override
+	public void render() {
+		IN_GAME_STAGE.act(Gdx.graphics.getDeltaTime());
+		IN_GAME_STAGE.draw();
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		IN_GAME_STAGE.getViewport().update(width, height, true);
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+}

@@ -1,0 +1,16 @@
+package poopgame.physics.components;
+
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Pool.Poolable;
+
+import poopgame.gamelogic.components.LogicComponent;
+
+public class BodyComponent extends LogicComponent implements Poolable {
+
+    public Body body;
+
+	@Override
+	public void reset() {
+		body = null;
+	}
+}

@@ -1,0 +1,29 @@
+package poopgame.gamelogic.components;
+
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.physics.box2d.World;
+
+public class UpdateComponent extends LogicComponent {
+	
+	public Updateable updateable;
+	
+	public UpdateComponent() {}
+
+	@Override
+	public Object storeState(Engine engine, World world) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void loadState(Object state, Engine engine, World world) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public static interface Updateable {
+		public void update(Entity entity, float delta);
+	}
+
+}

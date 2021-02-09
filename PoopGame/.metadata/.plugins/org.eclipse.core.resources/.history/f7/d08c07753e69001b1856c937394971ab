@@ -1,0 +1,30 @@
+package poopgame.graphics.components;
+
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Pool.Poolable;
+
+import poopgame.gamelogic.components.LogicComponent;
+
+public class TransformComponent extends LogicComponent {
+	public final Vector3 position = new Vector3();
+	public final Vector2 scale = new Vector2(1.0f, 1.0f);
+	public float rotation = 0.0f;
+	public boolean isHidden = false;
+	public boolean mustBeInFrame = false;
+
+	@Override
+	public Object storeState(Engine engine, World world) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void loadState(Object state, Engine engine, World world) {
+		// TODO Auto-generated method stub
+
+	}
+}

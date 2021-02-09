@@ -1,0 +1,108 @@
+package poopgame.gamelogic.engine;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
+
+import poopgame.gamelogic.components.LogicComponent;
+import poopgame.gamelogic.components.IdComponent;
+
+public class State {
+	
+	private TimeEngine timeEngine;
+	
+	private int nextActionIndex;
+	
+	private List<Long> entityIds = new ArrayList<>();
+	private Map<Long, List<Class<? extends Component>>> entityComponentTypes = new HashMap<>();
+	private Map<Long, Map<Class<? extends Component>, Object>> stateObjects = new HashMap<>();
+
+//	private Map<Long, Map<Class<? extends EntitySystem>, Object>> stateObjects = new HashMap<>();
+	
+	public State(TimeEngine timeEngine){
+		this.timeEngine = timeEngine;
+		nextActionIndex = timeEngine.nextActionIndex;
+		for(Entity entity : timeEngine.getEntities()){
+			IdComponent idComp = entity.getComponent(IdComponent.class);
+			if(idComp != null){
+				entityIds.add(idComp.id);
+				
+				List<Class<? extends Component>> componentTypes = new ArrayList<>();
+				entityComponentTypes.put(idComp.id, componentTypes);
+				
+				Map<Class<? extends Component>, Object> entityState = null;
+				for(Component component : entity.getComponents()){
+					componentTypes.add(component.getClass());
+					
+					if(component instanceof LogicComponent){
+						Object state = ((LogicComponent) component).storeState(timeEngine, timeEngine.getWorld());
+						if(state != null){
+							if(entityState == null){
+								entityState = new HashMap<>();
+								stateObjects.put(idComp.id, entityState);
+							}
+							entityState.put(component.getClass(), state);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public void restore(){
+		Map<Long, Entity> existingEntities = new HashMap<>();
+		for(Entity entity : timeEngine.getEntities()){
+			IdComponent idComp = entity.getComponent(IdComponent.class);
+			if(idComp != null){
+				// check if entity should be kept
+				if(!entityIds.contains(idComp.id)){
+					timeEngine.removeEntity(entity);
+				}else{
+					existingEntities.put(idComp.id, entity);
+					
+					// check which components should be kept
+					List<Class<? extends Component>> componentTypes = entityComponentTypes.get(idComp.id);
+					for(Component component : entity.getComponents()){
+						Class<? extends Component> componentType = component.getClass();
+						if(!componentTypes.contains(componentType)){
+							entity.remove(componentType);
+						}
+					}
+				}
+			}
+		}
+		
+		for(Long entityId : entityIds){
+			Entity entity = existingEntities.get(entityId);
+			if(entity == null){
+				entity = timeEngine.createEntity();
+			}
+			
+			Map<Class<? extends Component>, Object> entityStateObjects = stateObjects.get(entityId);
+			for(Class<? extends Component> componentType : entityComponentTypes.get(entityId)){
+				Component component = entity.getComponent(componentType);
+				if(component == null){
+					try {
+						component = componentType.getConstructor().newInstance();
+						entity.add(component);
+					} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						throw new RuntimeException("Failed to access empty constructor of " + componentType.getName(), e);
+					}
+				}
+				
+				Object stateObject = entityStateObjects.get(componentType);
+				if(stateObject != null){
+					((LogicComponent) component).loadState(stateObject, timeEngine, timeEngine.getWorld());
+				}
+			}
+		}
+
+		timeEngine.nextActionIndex = nextActionIndex;
+	}
+
+}

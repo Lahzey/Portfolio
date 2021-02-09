@@ -1,0 +1,155 @@
+package poopgame.ui;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+
+import com.creditsuisse.graphics.swing.Borders;
+import com.creditsuisse.graphics.swing.JImage;
+import com.creditsuisse.graphics.swing.SelectionPanel.SelectionDialog;
+import com.creditsuisse.util.ColorUtil;
+import com.creditsuisse.util.ExtendedThread;
+
+import net.miginfocom.swing.MigLayout;
+import poopgame.gamelogic.Arena;
+import poopgame.gamelogic.Champion;
+import poopgame.gamelogic.InputMap;
+import poopgame.gamelogic.Player;
+import poopgame.gamelogic.PoopGame;
+import poopgame.server.GameServer;
+import poopgame.server.LocalServer;
+import poopgame.server.RemoteServer;
+
+public class Lobby extends MenuPanel {
+	private static final long serialVersionUID = 1L;
+	
+	private GameServer server;
+	private Player activePlayer;
+	
+	private Arena[] allArenas = Arena.values();
+	private Arena selectedArena = allArenas[0];
+	
+	private JLabel arenaNameLabel;
+	private JImage arenaImage;
+	
+	private JPanel playerList;
+
+	public Lobby(String host, Champion champion, InputMap inputMap) throws Exception {
+		super("wrap 2, fill, insets 50", "[grow]50px[]", "");
+		
+		activePlayer = new Player("test", champion, inputMap);
+		if (host == null) {
+			server = new LocalServer();
+		} else {
+			server = new RemoteServer(host);
+		}
+		server.addPlayer(activePlayer);
+		
+		arenaNameLabel = new JLabel(selectedArena.getName());
+		arenaNameLabel.setFont(arenaNameLabel.getFont().deriveFont(100f));
+		add(arenaNameLabel);
+		arenaImage = new JImage(selectedArena.getIcon());
+		arenaImage.setFont(arenaImage.getFont().deriveFont(100f));
+		if (host == null) arenaImage.addActionListener(e -> changeArena());
+		add(arenaImage);
+		
+		playerList = new JPanel(new MigLayout("wrap 3, fill, insets 50", "[]20px[grow, fill]20px[]", ""));
+		playerList.setOpaque(false);
+		add(playerList, "span 2, grow");
+		
+		MenuButton exitButton = new MenuButton("EXIT");
+		exitButton.addActionListener(e -> showMainMenu());
+		add(exitButton, "left");
+		MenuButton startButton = new MenuButton(host == null ? "START" : "WAITING FOR HOST");
+		startButton.setEnabled(host == null);
+		startButton.addActionListener(e -> start());
+		add(startButton, "right");
+		
+		server.addLobbyUpdateListener(() -> updatePlayerList());
+	}
+	
+	private void updatePlayerList() {
+		System.out.println("lobbyUpdate received");
+		playerList.removeAll();
+		for (Player player : server.getPlayers()) {
+			playerList.add(new JImage(player.getChampion().getIcon()));
+			playerList.add(new JLabel(player.getName()));
+			JImage kickButton = new JImage(FontAwesomeSolid.TIMES, ColorUtil.ERROR_FOREGROUND_COLOR);
+			kickButton.setEnabled((server instanceof LocalServer) && player.getId() != activePlayer.getId());
+			playerList.add(kickButton);
+		}
+		playerList.revalidate();
+		playerList.repaint();
+	}
+	
+	private void changeArena() {
+		Arena newArena = new ArenaSelectionDialg().open();
+		if (newArena != null) {
+			selectedArena = newArena;
+			arenaNameLabel.setText(newArena.getName());
+			arenaImage.setImage(newArena.getIcon());
+		}
+	}
+
+	private void showMainMenu() {
+		server.dispose();
+		Container parent = getParent();
+		parent.remove(this);
+		parent.add(new MainMenu());
+		parent.revalidate();
+		parent.repaint();
+	}
+
+	private void start() {
+		SwingFrame.showGame();
+		new ExtendedThread() {
+			
+			@Override
+			public void run() {
+				sleepSilent(2000);
+				PoopGame.getInstance().executeAfterNextUpdate(() -> {
+					PoopGame.getInstance().setServer(server);
+					PoopGame.getInstance().setActivePlayer(activePlayer);
+				});
+			}
+		}.start();
+	}
+	
+	private class ArenaSelectionDialg extends SelectionDialog<Arena> {
+		private static final long serialVersionUID = 1L;
+
+		public ArenaSelectionDialg() {
+			super(arenaImage, true, allArenas);
+			selectionPanel.contentContainer.setBackground(new Color(93, 105, 73));
+			selectionPanel.remove(selectionPanel.searchField);
+		}
+
+		@Override
+		public Component createComponent(Arena element) {
+			JPanel arenaPanel = new JPanel(new BorderLayout());
+			arenaPanel.setOpaque(false);
+			arenaPanel.add(new JImage(element.getIcon()), BorderLayout.CENTER);
+			arenaPanel.add(new JLabel(element.getName()), BorderLayout.SOUTH);
+			Border hoveredBorder = BorderFactory.createEtchedBorder(EtchedBorder.RAISED, SwingFrame.FOREGROUND, SwingFrame.FOREGROUND.darker().darker());
+			Border clickedBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, SwingFrame.FOREGROUND, SwingFrame.FOREGROUND.darker().darker());
+			Borders.set(arenaPanel, null, hoveredBorder, clickedBorder);
+			return arenaPanel;
+		}
+
+		@Override
+		public boolean matchesFilter(Arena element, String filter) {
+			return element.getName().toLowerCase().contains(filter.toLowerCase());
+		}
+		
+	}
+
+}

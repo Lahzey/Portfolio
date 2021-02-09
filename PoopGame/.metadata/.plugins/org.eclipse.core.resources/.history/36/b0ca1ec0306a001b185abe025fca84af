@@ -1,0 +1,73 @@
+package poopgame.gamelogic.systems;
+
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+
+import poopgame.gamelogic.components.MovementComponent;
+import poopgame.gamelogic.engine.LogicSystem;
+import poopgame.graphics.components.AnimationComponent;
+import poopgame.physics.components.BodyComponent;
+
+public class MovementSystem extends EntitySystem implements LogicSystem {
+
+    private static final float STEP_TIME = 1/45f;
+
+	private ImmutableArray<Entity> updateableEntites;
+
+    private ComponentMapper<BodyComponent> bodyMapper = ComponentMapper.getFor(BodyComponent.class);
+    private ComponentMapper<MovementComponent> movementMapper = ComponentMapper.getFor(MovementComponent.class);
+    private ComponentMapper<AnimationComponent> animationMapper = ComponentMapper.getFor(AnimationComponent.class);
+
+    private float accumulator = 0f;
+
+	@Override
+	public void addedToEngine (Engine engine) {
+		updateableEntites = engine.getEntitiesFor(Family.all(BodyComponent.class, MovementComponent.class).get());
+	}
+
+	@Override
+	public void removedFromEngine (Engine engine) {
+		updateableEntites = null;
+	}
+
+    @Override
+    public void update(float deltaTime) {
+        accumulator += deltaTime;
+        while (accumulator >= STEP_TIME) {
+            accumulator -= STEP_TIME;
+        	step();
+        }
+    }
+    
+    private void step() {
+    	for (Entity entity : updateableEntites) {
+    		Body body = bodyMapper.get(entity).body;
+    		MovementComponent movementComp = movementMapper.get(entity);
+    		AnimationComponent animationComp = animationMapper.get(entity);
+    		
+    		float currentXVelocity = body.getLinearVelocity().x;
+    		float diff = getDesiredXVelocity() - currentXVelocity;
+    		if(Math.abs(diff) > 0.01) body.applyLinearImpulse(new Vector2(body.getMass() * diff, 0), body.getWorldCenter(), true);
+
+    		Vector2 position = body.getPosition();
+    		if(position.y < -height) die();
+    	}
+    }
+
+	@Override
+	public Float storeState() {
+		return accumulator;
+	}
+
+	@Override
+	public void loadState(Object state) {
+		accumulator = (Float) state;
+	}
+
+}

@@ -1,0 +1,225 @@
+package graphics.swing;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
+
+import com.creditsuisse.util.GeneralListener;
+
+import net.miginfocom.swing.MigLayout;
+
+public class CollapsibleTextPane extends JPanel {
+	private static final long serialVersionUID = 1L;
+
+	private JLabel title;
+	private JTextPane text;
+	private JScrollPane textScroll;
+	private JAnimationPanel textContainer = new JAnimationPanel(new BorderLayout());
+	private JImage collapseButton = new JImage(FontAwesomeSolid.CARET_DOWN, Color.DARK_GRAY);
+	private boolean collapsed = false;
+	
+	private boolean animated = true;
+	private final List<GeneralListener> sizeChangeListeners = new ArrayList<GeneralListener>();
+
+	public CollapsibleTextPane(String title, String text){
+		super(new MigLayout("fill, wrap 2, hidemode 3, insets 0", "[][grow, fill]", "[top][grow, fill]"));
+		this.title = new JLabel(title);
+		this.title.setFont(this.title.getFont().deriveFont(Font.BOLD));
+		this.title.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		this.text = new JTextPane();
+		this.text.setText(text);
+		textScroll = new JScrollPane(this.text);
+		textScroll.getVerticalScrollBar().setUnitIncrement(16);
+		
+		collapseButton.generateStateImages();
+		
+		add(collapseButton);
+		add(this.title);
+		textContainer.add(textScroll);
+		add(textContainer, "span 2, grow");
+		
+		collapseButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setCollapsed(!collapsed);
+			}
+		});
+		
+		this.title.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				setCollapsed(!collapsed);
+			}
+		});
+		
+		this.text.getDocument().addDocumentListener(new DocumentChangeListener() {
+			
+			@Override
+			protected void onChange(DocumentEvent e) {
+				adjustScrollHeight();
+			}
+		});
+	}
+	
+	@Override
+	public Dimension getPreferredSize(){
+		Dimension size = super.getPreferredSize();
+		Dimension textSize = text.getPreferredSize();
+		if(size.width < textSize.width){
+			return new Dimension(textSize.width, size.height);
+		}else{
+			return size;
+		}
+	}
+	
+	public boolean isCollapsed(){
+		return collapsed;
+	}
+	
+	public void setCollapsed(boolean collapsed){
+		if(collapsed != this.collapsed){
+			this.collapsed = collapsed;
+			if(animated){
+				Runnable afterAnimation = new Runnable() {
+					
+					@Override
+					public void run() {
+						notifySizeChangeListeners();
+					}
+				};
+				if(collapsed) textContainer.close(250, JAnimationPanel.VERTICAL).then(afterAnimation);
+				else textContainer.open(250, JAnimationPanel.VERTICAL).then(afterAnimation);
+			}else{
+				textContainer.setVisible(!collapsed);
+				notifySizeChangeListeners();
+			}
+			collapseButton.setImage(FontIcon.of(collapsed ? FontAwesomeSolid.CARET_RIGHT : FontAwesomeSolid.CARET_DOWN, Color.DARK_GRAY).toImage());
+			collapseButton.generateStateImages();
+			repaint();
+		}
+	}
+	
+	public String getTitle(){
+		return title.getText();
+	}
+	
+	public void setTitle(String title){
+		this.title.setText(title);
+	}
+	
+	public JLabel getTitleLabel(){
+		return title;
+	}
+	
+	public String getText(){
+		return text.getText();
+	}
+	
+	public void setText(String text){
+		this.text.setText(text);
+	}
+	
+	public JTextPane getTextPane(){
+		return text;
+	}
+
+	public boolean isEditable() {
+		return text.isEditable();
+	}
+
+	public void setEditable(boolean b) {
+		text.setEditable(b);
+	}
+	
+	public boolean isAnimated() {
+		return animated;
+	}
+
+	public void setAnimated(boolean animated) {
+		this.animated = animated;
+	}
+	
+	@Override
+	public void setFont(Font font) {
+		super.setFont(font);
+		if(text != null) text.setFont(font); // needs null check because it is called by swing in super constructor
+	}
+	
+	public void setTitleFont(Font font) {
+		title.setFont(font);
+	}
+	
+	public Font getTitleFont() {
+		return title.getFont();
+	}
+	
+	public void setTextBackground(Color bg){
+		text.setBackground(bg);
+	}
+	
+	public Color getTextBackground() {
+		return text.getBackground();
+	}
+
+	public boolean removeSizeChangeListener(GeneralListener sizeChangeListener) {
+		return sizeChangeListeners.remove(sizeChangeListener);
+	}
+
+	public void addSizeChangeListener(GeneralListener sizeChangeListener) {
+		sizeChangeListeners.add(sizeChangeListener);
+	}
+	
+	@Override
+	public void setMaximumSize(Dimension maximumSize) {
+		super.setMaximumSize(maximumSize);
+		adjustScrollHeight();
+	}
+	
+	private void notifySizeChangeListeners(){
+		for(GeneralListener sizeChangeListener : sizeChangeListeners){
+			sizeChangeListener.actionPerformed();
+		}
+	}
+	
+	private void adjustScrollHeight(){
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				if(isMaximumSizeSet() && text != null){
+					int prefTextHeight = text.getPreferredSize().height + text.getBorder().getBorderInsets(text).top + text.getBorder().getBorderInsets(text).bottom;
+					int scrollPaneInsetHeight = textScroll.getHeight() - textScroll.getVisibleRect().height;
+					int heightOfOtherComponents = getHeight() - textScroll.getHeight();
+					int height = Math.min(getMaximumSize().height - heightOfOtherComponents, prefTextHeight + scrollPaneInsetHeight);
+					Dimension size = new Dimension(textScroll.getPreferredSize().width, height);
+					textScroll.setPreferredSize(size);
+					
+					notifySizeChangeListeners();
+					revalidate();
+					repaint();
+				}
+			}
+		});
+	}
+	
+	
+}

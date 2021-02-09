@@ -1,0 +1,15 @@
+package poopgame.server;
+
+import poopgame.gamelogic.Player;
+
+public class JoinRequest {
+
+	public long id;
+	public String name;
+	public String name;
+	
+	public JoinRequest(Player player) {
+		this.player = player;
+	}
+	
+}

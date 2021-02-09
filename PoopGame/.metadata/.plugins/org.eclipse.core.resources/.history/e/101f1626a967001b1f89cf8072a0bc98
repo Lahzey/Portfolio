@@ -1,0 +1,65 @@
+package poopgame.ui;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
+import poopgame.data.FileLocations;
+import poopgame.data.TextureManager;
+import poopgame.desktop.GameWrapper;
+import poopgame.gamelogic.PoopGame;
+import poopgame.util.InternalAssetLoader;
+
+public class InGameStage extends Stage {
+
+	public static TextureManager TEXTURE_MANAGER;
+	public static Skin SKIN;
+
+	public static final float SMALL_PADDING = 5;
+	public static final float MEDIUM_PADDING = 10;
+	public static final float LARGE_PADDING = 20;
+
+	private PoopGame game;
+	private InputProcessor inputProcessor;
+	private Table root;
+
+	public InGameStage(PoopGame game) {
+		super(new ScreenViewport());
+		TEXTURE_MANAGER = new TextureManager();
+		SKIN = new Skin(Gdx.files.internal(FileLocations.SKINS + "/custom/custom.json"));
+		this.game = game;
+		this.inputProcessor = new InputMultiplexer(this, game.inputSystem);
+		initInterface();
+	}
+
+	public InputProcessor getInputProcessor() {
+		return inputProcessor;
+	}
+
+	private void initInterface() {
+		root = new Table();
+		root.setBackground(new TextureRegionDrawable(InternalAssetLoader.getTexture("poop.png")));
+		root.setFillParent(true);
+		root.top();
+		root.add(new Label("test\ntest\ntest", SKIN));
+
+		addActor(root);
+	}
+
+	@Override
+	public void act(float delta) {
+		super.act(delta);
+		game.step(delta);
+	}
+
+	public void dispose() {
+		game.dispose();
+	}
+
+}

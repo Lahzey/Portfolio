@@ -1,0 +1,469 @@
+package com.creditsuisse.graphics.swing;
+
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.LayoutManager;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.plaf.PanelUI;
+
+import com.creditsuisse.util.LoopThread;
+
+public class JAnimationPanel extends JPanel {
+
+	private static final long serialVersionUID = 1L;
+
+	public static final int HORIZONTAL = 1;
+	public static final int VERTICAL = 2;
+
+	public static final int BACKGROUND = 0;
+	public static final int FOREGROUND = 1;
+
+	private float repaintsPerSec = 30;
+
+	private final Map<Animation, Float> animationProgresses = new HashMap<Animation, Float>();
+	private final Map<Animation, AnimationCallback> animationCallbacks = Collections.synchronizedMap(new HashMap<Animation, AnimationCallback>());
+
+	private LoopThread timer;
+
+	private Dimension staticSize = null;
+
+	public JAnimationPanel() {
+		super();
+	}
+
+	public JAnimationPanel(boolean isDoubleBuffered) {
+		super(isDoubleBuffered);
+	}
+
+	public JAnimationPanel(LayoutManager layout, boolean isDoubleBuffered) {
+		super(layout, isDoubleBuffered);
+	}
+
+	public JAnimationPanel(LayoutManager layout) {
+		super(layout);
+	}
+
+	public final void setRepaintsPerSec(float repaintsPerSec) {
+		this.repaintsPerSec = repaintsPerSec;
+		if (timer != null && timer.isRunning())
+			timer.setLoopsPerSec(repaintsPerSec);
+	}
+
+	public final float getRepaintsPerSec() {
+		return repaintsPerSec;
+	}
+
+	public AnimationCallback startAnimation(final Animation animation) {
+		if (timer == null || !timer.isRunning()) {
+			timer = new LoopThread(repaintsPerSec) {
+
+				private long lastLoopTime = System.currentTimeMillis();
+
+				@Override
+				public void loopedRun() {
+					long currentTime = System.currentTimeMillis();
+					long timePassed = currentTime - lastLoopTime;
+					Set<Animation> animations = new HashSet<Animation>(animationProgresses.keySet());
+					for (Animation animation : animations) {
+						Float prevProgress = animationProgresses.get(animation);
+						float progress = prevProgress == null ? 1 : ((float) timePassed / animation.getTimeInMillis()) + animationProgresses.get(animation);
+						if (progress >= 1) {
+							progress = 1;
+							animation.apply(JAnimationPanel.this, progress);
+							animationCallbacks.get(animation).onFinish();
+							animationProgresses.remove(animation);
+							animationCallbacks.remove(animation);
+						} else
+							animationProgresses.put(animation, progress);
+					}
+
+					for (Animation animation : animationProgresses.keySet()) {
+						animation.apply(JAnimationPanel.this, animationProgresses.get(animation));
+					}
+					updateUI();
+					SwingUtil.revalidate(JAnimationPanel.this);
+					if (getParent() != null) {
+						getParent().repaint();
+					} else {
+						repaint();
+					}
+					lastLoopTime = currentTime;
+					if (animationProgresses.isEmpty()) {
+						terminate();
+					}
+				}
+			};
+			timer.start();
+		}
+		animation.onStart(this);
+		animationProgresses.put(animation, 0f);
+		AnimationCallback callback = new AnimationCallback();
+		animationCallbacks.put(animation, callback);
+		return callback;
+	}
+
+	public void finishAnimations() {
+		for (Animation animation : animationProgresses.keySet())
+			animationProgresses.put(animation, 1f);
+	}
+
+	public void finishAnimation(final Animation animation) {
+		animationProgresses.put(animation, 1f);
+	}
+
+	@Override
+	protected void paintComponent(Graphics g) {
+		synchronized (animationCallbacks) {
+			for (Animation animation : animationProgresses.keySet()) {
+				animation.onPaint(g);
+			}
+		}
+		super.paintComponent(g);
+	}
+
+	/**
+	 * Plays an animation that opens this panel to full size <br/>
+	 * That size is determined by
+	 * {@link PanelUI#getPreferredSize(javax.swing.JComponent)} on the PanelUI
+	 * from {@link #getUI()}.
+	 * 
+	 * @param timeInMillis
+	 *            the time it will take to open the panel
+	 * @param orientation
+	 *            the orientation to open it in <br/>
+	 *            May be {@link #HORIZONTAL}, {@link #VERTICAL} or the sum of
+	 *            both
+	 * @return a callback class to execute code after the animation
+	 */
+	public AnimationCallback open(int timeInMillis, int orientation) {
+		Dimension openSize = getLayout().preferredLayoutSize(this);
+		Dimension currentSize = isVisible() ? getSize() : new Dimension();
+		if (orientation == HORIZONTAL) {
+			openSize = new Dimension(openSize.width, -1);
+		} else if (orientation == VERTICAL) {
+			openSize = new Dimension(-1, openSize.height);
+		} else if (orientation != HORIZONTAL + VERTICAL) {
+			throw new IllegalArgumentException("Invalid orientation: " + orientation);
+		}
+
+		staticSize = currentSize;
+		setVisible(true);
+		return startAnimation(new ResizeAnimation(timeInMillis, openSize)).then(new Runnable() {
+
+			@Override
+			public void run() {
+				staticSize = null;
+			}
+		});
+	}
+
+	/**
+	 * Plays an animation that closes this panel.
+	 * 
+	 * @param timeInMillis
+	 * @param orientation
+	 *            the orientation to close it in <br/>
+	 *            May be {@link #HORIZONTAL}, {@link #VERTICAL} or the sum of
+	 *            both
+	 * @return a callback class to execute code after the animation
+	 */
+	public AnimationCallback close(int timeInMillis, int orientation) {
+		Dimension closedSize;
+		Dimension currentSize = getSize();
+		if (orientation == HORIZONTAL) {
+			closedSize = new Dimension(0, currentSize.height);
+		} else if (orientation == VERTICAL) {
+			closedSize = new Dimension(currentSize.width, 0);
+		} else if (orientation == HORIZONTAL + VERTICAL) {
+			closedSize = new Dimension();
+		} else {
+			throw new IllegalArgumentException("Invalid orientation: " + orientation);
+		}
+		return startAnimation(new ResizeAnimation(timeInMillis, closedSize)).then(new Runnable() {
+
+			@Override
+			public void run() {
+				setVisible(false);
+				staticSize = null;
+			}
+		});
+	}
+
+	public AnimationCallback appear(int timeInMillis) {
+		setVisible(true);
+		return startAnimation(new OpacityAnimation(timeInMillis, 0f, 1f));
+	}
+
+	public AnimationCallback disappear(int timeInMillis) {
+		return startAnimation(new OpacityAnimation(timeInMillis, 1f, 0f)).then(new Runnable() {
+
+			@Override
+			public void run() {
+				setVisible(false);
+			}
+		});
+	}
+
+	public AnimationCallback blinkBackground(final int timeInMillis, final Color color) {
+		return blink(timeInMillis, color, BACKGROUND);
+	}
+
+	public AnimationCallback blinkForeground(final int timeInMillis, final Color color) {
+		return blink(timeInMillis, color, FOREGROUND);
+	}
+
+	/**
+	 * Blinks this panel in the given color.
+	 * 
+	 * @param timeInMillis
+	 *            the total duration (on + off) of the blink
+	 * @param color
+	 *            the color to blink in
+	 * @param mode
+	 *            one of {@link #FOREGROUND} and {@link #BACKGROUND}
+	 */
+	public AnimationCallback blink(final int timeInMillis, final Color color, final int mode) {
+		final AnimationCallback callback = new AnimationCallback();
+
+		final Color startColor = mode == FOREGROUND ? getForeground() : getBackground();
+		startAnimation(new ColorAnimation(timeInMillis / 2, startColor, color, mode)).then(new Runnable() {
+
+			@Override
+			public void run() {
+				startAnimation((new ColorAnimation(timeInMillis / 2, color, startColor, mode))).then(new Runnable() {
+
+					@Override
+					public void run() {
+						callback.onFinish();
+					}
+				});
+			}
+		});
+
+		return callback;
+	}
+
+	public static class AnimationCallback {
+
+		private List<Runnable> executeAfter = new ArrayList<Runnable>();
+
+		public AnimationCallback then(Runnable execute) {
+			return executeAfter(execute);
+		}
+
+		public AnimationCallback executeAfter(Runnable toExecute) {
+			executeAfter.add(toExecute);
+			return this;
+		}
+
+		void onFinish() {
+			for (Runnable toExecute : executeAfter) {
+				if (toExecute instanceof Thread) {
+					((Thread) toExecute).start();
+				} else {
+					toExecute.run();
+				}
+			}
+		}
+
+	}
+
+	public static abstract class Animation {
+
+		private int timeInMillis;
+
+		public Animation(int timeInMillis) {
+			setTimeInMillis(timeInMillis);
+		}
+
+		public void onStart(JAnimationPanel panel) {
+
+		}
+
+		public void onPaint(Graphics g) {
+
+		}
+
+		public abstract void apply(JAnimationPanel panel, float progress);
+
+		public int getTimeInMillis() {
+			return timeInMillis;
+		}
+
+		public void setTimeInMillis(int timeInMillis) {
+			this.timeInMillis = timeInMillis;
+		}
+	}
+
+	public static class ResizeAnimation extends Animation {
+
+		private Dimension targetSize;
+
+		private final Map<JAnimationPanel, Dimension> originalSizes = new HashMap<JAnimationPanel, Dimension>();
+
+		public ResizeAnimation(int timeInMillis, Dimension targetSize) {
+			super(timeInMillis);
+			setTargetSize(targetSize);
+		}
+
+		public Dimension getTargetSize() {
+			return targetSize;
+		}
+
+		public void setTargetSize(Dimension targetSize) {
+			this.targetSize = targetSize;
+		}
+
+		@Override
+		public void apply(JAnimationPanel panel, float progress) {
+			Dimension originalSize = originalSizes.get(panel);
+			int xClip = targetSize.width >= 0 ? (int) ((originalSize.width - targetSize.width) * progress) : -1;
+			int yClip = targetSize.height >= 0 ? (int) ((originalSize.height - targetSize.height) * progress) : -1;
+			Dimension size = new Dimension(originalSize.width - xClip, originalSize.height - yClip);
+			panel.staticSize = size;
+		}
+
+		@Override
+		public void onStart(JAnimationPanel panel) {
+			Dimension size = panel.getSize();
+			originalSizes.put(panel, size != null ? size : new Dimension());
+		}
+
+	}
+
+	public static class OpacityAnimation extends Animation {
+
+		private float startOpacity;
+		private float opacityDif;
+		private float currentOpacity;
+
+		public OpacityAnimation(int timeInMillis, float startOpacity, float endOpacity) {
+			super(timeInMillis);
+			if (startOpacity > 1 || startOpacity < 0 || endOpacity > 1 || endOpacity < 0) {
+				throw new IllegalArgumentException("Opacites must be between (and including) 0 and 1");
+			}
+			this.startOpacity = startOpacity;
+			opacityDif = endOpacity - startOpacity;
+		}
+
+		@Override
+		public void apply(JAnimationPanel panel, float progress) {
+			currentOpacity = startOpacity + (opacityDif * progress);
+		}
+
+		@Override
+		public void onPaint(Graphics g) {
+			((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, currentOpacity));
+		}
+
+	}
+
+	public static class ColorAnimation extends Animation {
+
+		private final int mode;
+		private final int rBase, gBase, bBase, aBase, rDif, gDif, bDif, aDif;
+
+		public ColorAnimation(int timeInMillis, Color startColor, Color endColor, int mode) {
+			super(timeInMillis);
+			this.mode = mode;
+			if (mode != BACKGROUND && mode != FOREGROUND) {
+				throw new IllegalArgumentException("mode must be one of 0 (BACKGROUND) and 1 (FOREGROUND)");
+			}
+
+			rBase = startColor.getRed();
+			gBase = startColor.getGreen();
+			bBase = startColor.getBlue();
+			aBase = startColor.getAlpha();
+
+			rDif = endColor.getRed() - startColor.getRed();
+			gDif = endColor.getGreen() - startColor.getGreen();
+			bDif = endColor.getBlue() - startColor.getBlue();
+			aDif = endColor.getAlpha() - startColor.getAlpha();
+		}
+
+		@Override
+		public void apply(final JAnimationPanel panel, final float progress) {
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					int r = rBase + (int) (rDif * progress);
+					r = Math.max(0, Math.min(255, r));
+					int g = gBase + (int) (gDif * progress);
+					g = Math.max(0, Math.min(255, g));
+					int b = bBase + (int) (bDif * progress);
+					b = Math.max(0, Math.min(255, b));
+					int a = aBase + (int) (aDif * progress);
+					a = Math.max(0, Math.min(255, a));
+
+					switch (mode) {
+					case BACKGROUND:
+						panel.setBackground(new Color(r, g, b, a));
+						break;
+					case FOREGROUND:
+						panel.setForeground(new Color(r, g, b, a));
+						break;
+					}
+				}
+			});
+		}
+
+		@Override
+		public void onStart(JAnimationPanel panel) {
+			panel.setBackground(new Color(rBase, gBase, bBase, aBase));
+		}
+
+	}
+
+	@Override
+	public Dimension getSize() {
+		Dimension superSize = super.getSize();
+		if (staticSize == null) {
+			return superSize;
+		} else {
+			return new Dimension(staticSize.width >= 0 ? staticSize.width : superSize.width, staticSize.height >= 0 ? staticSize.height : superSize.height);
+		}
+	}
+
+	@Override
+	public Dimension getPreferredSize() {
+		Dimension superSize = super.getPreferredSize();
+		if (staticSize == null) {
+			return superSize;
+		} else {
+			return new Dimension(staticSize.width >= 0 ? staticSize.width : superSize.width, staticSize.height >= 0 ? staticSize.height : superSize.height);
+		}
+	}
+
+	@Override
+	public Dimension getMaximumSize() {
+		Dimension superSize = super.getMaximumSize();
+		if (staticSize == null) {
+			return superSize;
+		} else {
+			return new Dimension(staticSize.width >= 0 ? staticSize.width : superSize.width, staticSize.height >= 0 ? staticSize.height : superSize.height);
+		}
+	}
+
+	@Override
+	public Dimension getMinimumSize() {
+		Dimension superSize = super.getMinimumSize();
+		if (staticSize == null) {
+			return superSize;
+		} else {
+			return new Dimension(staticSize.width >= 0 ? staticSize.width : superSize.width, staticSize.height >= 0 ? staticSize.height : superSize.height);
+		}
+	}
+}

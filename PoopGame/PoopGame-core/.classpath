@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="lib/gdx.jar" sourcepath="lib/gdx-sources.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GlobalUtil"/>
+	<classpathentry kind="lib" path="lib/ashley-1.7.3.jar" sourcepath="lib/ashley-1.7.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/gdx-freetype.jar" sourcepath="lib/gdx-freetype-sources.jar"/>
+	<classpathentry kind="lib" path="lib/gdx-box2d.jar" sourcepath="lib/gdx-box2d-sources.jar"/>
+	<classpathentry kind="lib" path="/GlobalUtil/lib/miglayout-4.0.jar" sourcepath="/GlobalUtil/lib/miglayout-4.0-sources.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Ikonli"/>
+	<classpathentry kind="lib" path="lib/kryonet-2.21-all.jar" sourcepath="lib/kryonet-kryonet-2.21.zip"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

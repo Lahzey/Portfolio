@@ -1,0 +1,28 @@
+package poopgame.server;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.esotericsoftware.kryo.Kryo;
+
+import poopgame.gamelogic.Arena;
+import poopgame.gamelogic.Champion;
+import poopgame.gamelogic.components.PlayerComponent;
+import poopgame.gamelogic.engine.actions.ActionType;
+import poopgame.graphics.components.TransformComponent;
+import poopgame.physics.components.BodyComponent;
+
+public class RequestRegister {
+
+	public static Class<?>[] getRequestTypes() {
+		return new Class<?>[] { JoinRequest.class, JoinRequest[].class, LeaveRequest.class, LobbyUpdate.class, StartSignal.class, ActionRequest.class, StateUpdate.class,
+			Champion.class, Arena.class, ActionType.class, HashMap.class, ArrayList.class, Class.class, BodyComponent.class, TransformComponent.class, PlayerComponent.class };
+	}
+
+	public static void registerAll(Kryo kryo) {
+		for (Class<?> type : getRequestTypes()) {
+			kryo.register(type);
+		}
+	}
+
+}

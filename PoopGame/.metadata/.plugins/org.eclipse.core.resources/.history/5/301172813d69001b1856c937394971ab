@@ -1,0 +1,33 @@
+package poopgame.physics.components;
+
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Pool.Poolable;
+
+import poopgame.gamelogic.components.LogicComponent;
+
+public class BodyComponent extends LogicComponent implements Poolable {
+
+    public Body body;
+
+	@Override
+	public void reset() {
+		body = null;
+	}
+
+	@Override
+	public Object storeState(Engine engine, World world) {
+		Vector2 position = body.getPosition();
+		float angle = body.getAngle();
+		Vector2 linearVelocity = body.getLinearVelocity();
+		float angularVelocity = body.getAngularVelocity();
+	}
+
+	@Override
+	public void loadState(Object state, Engine engine, World world) {
+		// TODO Auto-generated method stub
+		
+	}
+}

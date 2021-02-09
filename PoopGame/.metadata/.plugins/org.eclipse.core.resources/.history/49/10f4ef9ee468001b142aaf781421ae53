@@ -1,0 +1,7 @@
+package poopgame.server;
+
+public class StartSignal {
+
+	public long startTime;
+	
+}

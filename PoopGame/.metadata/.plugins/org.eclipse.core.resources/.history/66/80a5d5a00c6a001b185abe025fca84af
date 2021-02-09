@@ -1,0 +1,24 @@
+package poopgame.gamelogic.components;
+
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.physics.box2d.World;
+
+public class MovementComponent extends LogicComponent {
+
+	@Override
+	public Object storeState(Engine engine, World world) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void loadState(Object state, Engine engine, World world) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	
+	
+}

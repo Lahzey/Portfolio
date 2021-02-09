@@ -1,0 +1,29 @@
+package poopgame.gamelogic.components;
+
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.physics.box2d.World;
+
+import poopgame.gamelogic.Stats;
+import poopgame.util.InternalAssetLoader;
+
+public class StatsComponent extends LogicComponent {
+
+	public Stats stats;
+	
+	public StatsComponent() {}
+	
+	public StatsComponent(Stats stats) {
+		this.stats = stats;
+	}
+
+	@Override
+	public Object storeState(Engine engine, World world) {
+		return stats;
+	}
+
+	@Override
+	public void loadState(Object state, Engine engine, World world) {
+		this.stats = (Stats) state;
+	}
+
+}

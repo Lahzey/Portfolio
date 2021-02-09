@@ -1,0 +1,21 @@
+package poopgame.gamelogic.components;
+
+import com.badlogic.ashley.core.Component;
+import com.badlogic.gdx.utils.Pool.Poolable;
+
+public class UpdateComponent implements Component, Poolable{
+	
+	public Updateable updateable;
+	
+	public UpdateComponent() {}
+
+	@Override
+	public void reset() {
+		updateable = null;
+	}
+	
+	public static interface Updateable{
+		public void update(float delta);
+	}
+
+}

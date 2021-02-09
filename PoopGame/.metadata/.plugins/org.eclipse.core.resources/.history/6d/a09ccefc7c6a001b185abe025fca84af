@@ -1,0 +1,26 @@
+package poopgame.ui;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import com.badlogic.ashley.core.Entity;
+
+import graphics.swing.JImage;
+import graphics.swing.KeyChooseButton;
+import poopgame.gamelogic.Champion;
+import poopgame.gamelogic.PoopGame;
+import poopgame.gamelogic.engine.actions.ActionType;
+
+public class ChampSelection extends MenuPanel {
+	private static final long serialVersionUID = 1L;
+
+	public ChampSelection(Entity winner) {
+		super("", "", "");
+	}
+
+}

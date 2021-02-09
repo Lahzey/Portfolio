@@ -1,0 +1,16 @@
+package poopgame.server;
+
+import poopgame.gamelogic.Arena;
+
+public class LobbyUpdate {
+
+	public JoinRequest[] joinedPlayers;
+	public Arena arena;
+	
+	public LobbyUpdate() {}
+
+	public LobbyUpdate(JoinRequest... joinedPlayers) {
+		this.joinedPlayers = joinedPlayers;
+	}
+
+}

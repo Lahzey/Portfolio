@@ -1,0 +1,14 @@
+package poopgame.server;
+
+import poopgame.gamelogic.Player;
+import poopgame.gamelogic.engine.actions.Action;
+
+public class JoinRequest {
+
+	public Player player;
+	
+	public JoinRequest(Player player) {
+		this.player = player;
+	}
+	
+}

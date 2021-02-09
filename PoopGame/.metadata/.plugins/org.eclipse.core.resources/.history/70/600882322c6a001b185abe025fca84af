@@ -1,0 +1,141 @@
+package poopgame.gamelogic;
+
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.Shape;
+
+import poopgame.gamelogic.engine.TimeEngine;
+import poopgame.physics.BodyInfo;
+
+public class AtomicPoop extends Poop {
+
+	public AtomicPoop(Entity pooper) {
+		super(pooper);
+	}
+	
+	@Override
+	public Entity create(TimeEngine engine, Vector2 position, boolean physics, Sound sound) {
+		Entity entity = super.create(engine, position, physics, sound);
+		getStats(entity).setDamage(1000000);
+		getStats(entity).setStat(DAMAGE_AMP, 0f);
+		return entity;
+	}
+
+	@Override
+	public String getTextureName() {
+		return Champion.KIM.getFolderName() + "special/atomicpoop.png";
+	}
+
+	protected boolean isCollidingTargetValid(Fixture colliding) {
+		return true;
+	}
+	
+	@Override
+	public void destroy() {
+		super.destroy();
+		createAtomicWaste();
+	}
+
+	public void createAtomicWaste() {
+		new AtomicWaste().create(game);
+		detonationCallback.run();
+	}
+
+	@Override
+	public void update(float delta) {
+		super.update(delta);
+		if (!alive) {
+			detonationCallback.run();
+		}
+	}
+
+	private class AtomicWaste extends GameEntity {
+
+		private static final float MIN_DIAMETER = 0.5f;
+		private static final float MAX_DIAMETER = 5f;
+		private static final int DAMAGE_PER_SEC = 50;
+		private static final int REMAINING_TIME = 50;
+		
+		private Entity poop;
+
+		private long duration = 7000;
+		private long expandDuration = 1000;
+		private long spawnedAt;
+
+		public AtomicWaste(Entity poop) {
+			super(MIN_DIAMETER, MIN_DIAMETER, true);
+			this.poop = poop;
+		}
+		
+		@Override
+		public String generateId() {
+			return generateChildId(poop, "AtomicWaste");
+		}
+		
+		@Override
+		public Entity create(TimeEngine engine, Vector2 position) {
+			Entity entity =  super.create(engine, position);
+			
+			return entity;
+		}
+
+		public void create(PoopGame game) {
+			super.create(game);
+			spawnedAt = System.currentTimeMillis();
+		}
+
+		// Called by UpdateComponent
+		public static void update(TimeEngine engine, Entity entity, float delta) {
+			long current = System.currentTimeMillis();
+			for (Fixture colliding : fixInfo.colliding.values()) {
+				BodyInfo collidingInfo = (BodyInfo) colliding.getBody().getUserData();
+				if (collidingInfo.origin instanceof Player) {
+					Player victim = (Player) collidingInfo.origin;
+					victim.getStats().setHealth(victim.getStats().getHealth() - (DAMAGE_PER_SEC * delta));
+				}
+			}
+
+			if (current - spawnedAt > duration) {
+				destroy();
+			}
+
+			CircleShape shape = (CircleShape) fixInfo.fixture.getShape();
+			double progress = Math.min(1, ((double) current - spawnedAt) / expandDuration);
+			float diameter = (float) (MIN_DIAMETER + (MAX_DIAMETER - MIN_DIAMETER) * progress);
+			shape.setRadius(diameter / 2);
+			fixInfo.width = diameter;
+			fixInfo.height = diameter;
+			body.setTransform(body.getPosition().add(0, 10 * delta / (duration / 1000)), 0);
+		}
+
+		@Override
+		protected Shape getShape() {
+			CircleShape shape = new CircleShape();
+			shape.setRadius(MIN_DIAMETER / 2);
+			return shape;
+		}
+
+		@Override
+		protected String getTextureName() {
+			return Champion.KIM.getFolderName() + "special/atomicwaste.png";
+		}
+
+		@Override
+		protected Vector2 getSpawnPosition() {
+			return AtomicPoop.this.body.getPosition();
+		}
+
+		@Override
+		protected BodyDef getBodyDef() {
+			BodyDef bodyDef = super.getBodyDef();
+			bodyDef.type = BodyType.StaticBody;
+			return bodyDef;
+		}
+	}
+
+}

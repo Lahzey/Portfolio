@@ -1,0 +1,39 @@
+package poopgame.gamelogic.abilities.special;
+
+import com.badlogic.gdx.audio.Sound;
+
+import poopgame.gamelogic.AtomicPoop;
+import poopgame.gamelogic.Player;
+import poopgame.util.InternalAssetLoader;
+
+public class KimSpecial extends SpecialAbility {
+
+	public KimSpecial(Player player) {
+		super(player);
+	}
+
+	private Sound sound = InternalAssetLoader.getSound("nuke.mp3");
+	private AtomicPoop poop;
+
+	@Override
+	public void cast() {
+		if (poop == null) {
+			poop = new AtomicPoop(super.player, new Runnable() {
+
+				@Override
+				public void run() {
+					poop = null;
+				}
+
+			});
+			
+			poop.create(super.player.getGame());
+			player.getStats().setEnergy(100);
+			sound.play();
+
+		} else {
+			poop.onDetonate();
+		}
+	}
+
+}

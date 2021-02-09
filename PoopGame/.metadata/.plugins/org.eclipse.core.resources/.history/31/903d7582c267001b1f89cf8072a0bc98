@@ -1,0 +1,7 @@
+package poopgame.gamelogic;
+
+public class InputMap {
+	
+	public static final String moveLeft = "LEFT";
+
+}

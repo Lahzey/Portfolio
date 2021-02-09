@@ -1,0 +1,23 @@
+package poopgame.gamelogic.abilities.passive;
+
+import com.badlogic.ashley.core.Entity;
+
+import poopgame.gamelogic.GameEntity;
+import poopgame.gamelogic.engine.TimeEngine;
+
+public class NinjaPassive extends PassiveAbility {
+	
+	protected static final String LAST_POOP_STAT_NAME = "lastPoop";
+
+	@Override
+	public void update(TimeEngine engine, Entity player, float deltaTime) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void onShoot(TimeEngine engine, Entity player, Entity poop) {
+		GameEntity.getStats(player).setStat(LAST_POOP_STAT_NAME, GameEntity.getId(poop));
+	}
+
+}

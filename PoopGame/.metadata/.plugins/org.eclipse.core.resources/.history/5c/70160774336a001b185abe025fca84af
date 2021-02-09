@@ -1,0 +1,208 @@
+package poopgame.gamelogic;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Fixture;
+
+import poopgame.gamelogic.components.MovementComponent;
+import poopgame.gamelogic.components.PlayerComponent;
+import poopgame.gamelogic.engine.TimeEngine;
+import poopgame.gamelogic.engine.actions.Action;
+import poopgame.graphics.components.AnimationComponent;
+import poopgame.graphics.components.TransformComponent;
+import poopgame.physics.BodyInfo;
+import poopgame.physics.FixtureInfo;
+import util.ArrayUtil;
+import util.GenericListener;
+
+public class Player extends GameEntity {
+
+	private static final long MAX_CHARGE_TIME = 5000;
+	private static final float MAX_CHARGE_DMG_AMP = 3f;
+	private static final float MAX_CHARGE_SPEED_AMP = 5f;
+
+	private static final Random RANDOM = new Random();
+
+	private PlayerComponent playerComponent = new PlayerComponent();
+
+	private List<GenericListener<Poop>> shootListeners = new ArrayList<>();
+
+	public Player(Long id, String name, Champion champ) {
+		this(id, name, champ, new InputMap());
+	}
+
+	public Player(String name, Champion champ, InputMap inputMap) {
+		this(RANDOM.nextLong(), name, champ, inputMap);
+	}
+
+	public Player(Long id, String name, Champion champ, InputMap inputMap) {
+		super(champ.getWidth(), champ.getHeight(), false);
+		playerComponent.id = id;
+		playerComponent.name = name;
+		playerComponent.champ = champ;
+	}
+
+	@Override
+	public String generateId() {
+		return "Player[" + playerComponent.id + "]";
+	}
+
+	@Override
+	protected String getTextureName() {
+		return playerComponent.champ.getFolderName() + "model.png"; // will be overwritten by animation
+	}
+
+	@Override
+	public Entity create(TimeEngine engine, Vector2 position) {
+		Entity entity = super.create(engine, position);
+		entity.add(playerComponent);
+		entity.getComponent(TransformComponent.class).mustBeInFrame = true;
+		entity.add(new MovementComponent(playerComponent.champ.getFolderName()));
+		entity.add(new AnimationComponent());
+		return entity;
+	}
+
+	// Called by UpdateComponent
+	public static void update(TimeEngine engine, Entity entity, float delta) {
+		Stats stats = getStats(entity);
+
+		// check if dead
+		if (stats.getHealth() <= 0) {
+			engine.removeEntity(entity);
+			return;
+		}
+
+		// check if fallen out of map
+		Vector2 position = getBody(entity).getPosition();
+		if (position.y < -entity.getComponent(PlayerComponent.class).champ.getHeight()) {
+			stats.setHealth(0);
+			engine.removeEntity(entity);
+			return;
+		}
+
+		// wrap around
+		float maxX = PoopGame.getInstance().tiledMapCollision.getMapDimensions().x;
+		if (position.x < 0) {
+			getBody(entity).setTransform(maxX, position.y, 0);
+		} else if (position.x > maxX) {
+			getBody(entity).setTransform(0, position.y, 0);
+		}
+
+		// regenerate energy
+		stats.setEnergy(stats.getEnergy() + (stats.getEnergyRegen() * delta));
+	}
+
+	private int getDesiredXVelocity() {
+		int velocity = 0;
+		if (getStats().isMovingRight()) velocity += playerComponent.stats.getSpeed();
+		if (getStats().isMovingLeft()) velocity -= playerComponent.stats.getSpeed();
+		return velocity;
+	}
+
+	public static void executeAction(TimeEngine engine, Entity player, Action action) {
+		if (getStats(player).getHealth() <= 0) {
+			return;
+		}
+
+		switch (action.getType()) {
+		case JUMP:
+			tryJump();
+			break;
+		case MOVE_LEFT_END:
+			getStats().setMovingLeft(false);
+			if (!getStats().isMovingRight()) {
+				animationComponent.animation = standLeft;
+			}
+			break;
+		case MOVE_LEFT_START:
+			getStats().setMovingLeft(true);
+			animationComponent.animation = walkLeft;
+			break;
+		case MOVE_RIGHT_END:
+			getStats().setMovingRight(false);
+			if (!getStats().isMovingRight()) {
+				animationComponent.animation = standRight;
+			}
+			break;
+		case MOVE_RIGHT_START:
+			getStats().setMovingRight(true);
+			animationComponent.animation = walkRight;
+			break;
+		case POOP_END:
+			tryShoot(engine.getTime());
+			break;
+		case POOP_START:
+			getStats().setShootStart(engine.getTime());
+			break;
+		case SPECIAL:
+			trySpecial(engine);
+			break;
+		}
+	}
+
+	private static void tryJump(Entity player) {
+		Body body = getBody(player);
+		if (isOnGround(body)) {
+			body.applyLinearImpulse(new Vector2(0, getStats(player).getJumpForce() * body.getMass()), body.getPosition(), true);
+			ArrayUtil.randomElementFrom(player.getComponent(PlayerComponent.class).champ.getJumpSounds()).play();
+		}
+	}
+
+	private static boolean isOnGround(Body body) {
+		Fixture mainFixture = ((BodyInfo) body.getUserData()).mainFixture;
+		FixtureInfo fixInfo = (FixtureInfo) mainFixture.getUserData();
+		return Math.abs(body.getLinearVelocity().y) < 0.01 && fixInfo.colliding.size() > 0;
+	}
+
+	private static void tryShoot(Entity player, long currentTime) {
+		long chargeTime = getStats(player).getShootStart() > 0 ? currentTime - getStats(player).getShootStart() : 0;
+		getStats(player).setShootStart(0);
+
+		if (getStats(player).getLastShot() + (1000 / getStats(player).getPoopingSpeed()) > currentTime) {
+			// cannot shoot yet
+			return;
+		}
+
+		Poop poop;
+		if (chargeTime < 500) {
+			// normal shot
+			poop = new Poop(this);
+			poop.create(game);
+		} else {
+			// charged shot
+			chargeTime = Math.min(chargeTime, 5000);
+			float chargePercentage = chargeTime / (float) MAX_CHARGE_TIME;
+			poop = new Poop(this);
+			poop.damage *= ((MAX_CHARGE_DMG_AMP - 1) * chargePercentage) + 1;
+			poop.damageAmpPerSec = 0;
+			poop.create(game);
+
+			Body poopBody = poop.getBody();
+			float shootUpForce = playerComponent.stats.getShootUpForce() * poopBody.getMass();
+			shootUpForce *= ((MAX_CHARGE_SPEED_AMP - 1) * chargePercentage) + 1;
+			poopBody.applyLinearImpulse(new Vector2(0, shootUpForce), poopBody.getPosition(), true);
+		}
+
+		getStats().setLastShot(currentTime);
+
+		for (GenericListener<Poop> listener : shootListeners) {
+			listener.actionPerformed(poop);
+		}
+	}
+
+	private void trySpecial(TimeEngine engine) {
+		if (getStats().getEnergy() >= 100) {
+			getStats().setEnergy(0);
+			getSpecial().cast(engine);
+		}
+	}
+
+	public void addShootListener(GenericListener<Poop> listener) {
+		shootListeners.add(listener);
+	}
+}

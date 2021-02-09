@@ -1,0 +1,78 @@
+package poopgame.gamelogic;
+
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Fixture;
+
+import poopgame.gamelogic.engine.TimeEngine;
+import poopgame.physics.BodyInfo;
+import poopgame.util.InternalAssetLoader;
+
+public class Poop extends GameEntity {
+	
+	public static final String DAMAGE_AMP = "damageAmp";
+	public static final String SECONDS_IN_AIR = "secondsInAir";
+	
+	private static final Sound SOUND = InternalAssetLoader.getSound("poopsound.mp3");
+	
+	protected Entity pooper;
+	
+	public Poop(Entity pooper) {
+		super(0.5f, 0.5f, true);
+	}
+	
+	@Override
+	public String generateId() {
+		return generateChildId(pooper, getClass().getSimpleName());
+	}
+	
+	public Entity create(TimeEngine engine, Vector2 location) {
+		return create(engine, true, SOUND);
+	}
+	
+	public Entity create(TimeEngine engine, boolean physics, Sound sound) {
+		Entity poop = super.create(engine);
+		if(physics) getBody(poop).setLinearVelocity(getBody(pooper).getLinearVelocity().cpy().scl(1.5f));
+		
+		//Play poop sound
+		if(sound != null) sound.play();
+		
+		return poop;
+	}
+
+	@Override
+	public void update(float delta) {
+		if(!alive) return;
+		
+		secondsInAir += delta;
+		for(Fixture colliding : fixInfo.colliding.values()) {
+			BodyInfo collidingInfo = (BodyInfo) colliding.getBody().getUserData();
+			if(collidingInfo.origin instanceof Player && collidingInfo.origin != pooper) {
+				onConfirmedCollision((Player) collidingInfo.origin);
+			}
+		}
+		
+		if(body.getPosition().y < -height) {
+			destroy();
+		}
+		
+		Vector2 position = body.getPosition();
+		
+		//wrap around
+		float maxX = game.tiledMapCollision.getMapDimensions().x;
+		if(position.x < 0) body.setTransform(maxX, position.y, 0);
+		else if(position.x > maxX) body.setTransform(0, position.y, 0);
+	}
+	
+	protected void onConfirmedCollision(Player target) {
+		destroy();
+		int damage = (int) (this.damage * (1 + (secondsInAir * damageAmpPerSec)));
+		target.getStats().setHealth(target.getStats().getHealth() - damage);
+	}
+
+	@Override
+	protected String getTextureName() {
+		return "poop.png";
+	}
+}

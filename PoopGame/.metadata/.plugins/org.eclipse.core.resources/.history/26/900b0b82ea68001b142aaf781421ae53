@@ -1,0 +1,30 @@
+package poopgame.desktop;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import com.creditsuisse.graphics.swing.Inspector;
+
+import poopgame.ui.SwingFrame;
+
+public class SwingLauncher {
+	
+	public static void main(String[] args) {
+		// needs to be done first to initialize GDX resource management
+		JPanel gameContainer = new JPanel(new BorderLayout());
+		SwingWrapper wrapper = new SwingWrapper();
+        gameContainer.add(wrapper.getCanvas(), BorderLayout.CENTER);
+        
+		SwingFrame swingFrame = new SwingFrame(gameContainer);
+		swingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		swingFrame.setSize(1000, 1000); // used when exiting maximized state
+		swingFrame.setExtendedState(swingFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		swingFrame.setVisible(true);
+		
+		Inspector.setActive(true);
+	}
+	
+}

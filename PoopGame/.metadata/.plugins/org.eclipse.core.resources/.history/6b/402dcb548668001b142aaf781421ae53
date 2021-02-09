@@ -1,0 +1,7 @@
+package poopgame.ui;
+
+public abstract class InputProcessor {
+
+	
+	
+}

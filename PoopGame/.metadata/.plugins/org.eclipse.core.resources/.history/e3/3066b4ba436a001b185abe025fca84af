@@ -1,0 +1,49 @@
+package poopgame.graphics.components;
+
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.World;
+
+import poopgame.gamelogic.components.LogicComponent;
+import poopgame.util.InternalAssetLoader;
+
+public class AnimationComponent extends LogicComponent {
+
+	private Animation<TextureRegion> animation;
+
+	private String animationPath;
+	private float elapsedTime = 0;
+
+	public AnimationComponent() {
+	}
+
+	public AnimationComponent(String animationPath) {
+		setAnimation(animationPath);
+	}
+
+	public void setAnimation(String animationPath) {
+		this.animationPath = animationPath;
+		animation = InternalAssetLoader.getAnimation(animationPath);
+		elapsedTime = 0;
+	}
+
+	public TextureRegion getKeyFrame(float deltaTime) {
+		if (animation != null) {
+			elapsedTime += deltaTime;
+			return animation.getKeyFrame(elapsedTime);
+		} else return null;
+	}
+
+	@Override
+	public Object storeState(Engine engine, World world) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void loadState(Object state, Engine engine, World world) {
+		// TODO Auto-generated method stub
+		
+	}
+}

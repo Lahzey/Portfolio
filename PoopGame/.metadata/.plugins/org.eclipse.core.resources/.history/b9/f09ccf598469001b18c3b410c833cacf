@@ -1,0 +1,125 @@
+package poopgame.gamelogic;
+
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+
+import poopgame.gamelogic.components.IdComponent;
+import poopgame.gamelogic.components.UpdateComponent;
+import poopgame.gamelogic.components.UpdateComponent.Updateable;
+import poopgame.physics.BodyInfo;
+import poopgame.physics.FixtureInfo;
+import poopgame.util.InternalAssetLoader;
+
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
+
+public abstract class GameEntity implements Updateable {
+
+	protected String id;
+	
+	protected float width;
+	protected float height;
+
+	protected boolean isSensor;
+	protected boolean alive;
+
+	protected PoopGame game;
+	protected Entity entity;
+	protected Body body;
+	protected FixtureInfo fixInfo;
+
+	public GameEntity(String id, float width, float height, boolean isSensor) {
+		this.id = id;
+		this.width = width;
+		this.height = height;
+		this.isSensor = isSensor;
+	}
+	
+	public PoopGame getGame() {
+		return game;
+	}
+
+	public void create(PoopGame game) {
+		this.game = game;
+		BodyDef bodyDef = getBodyDef();
+		body = game.world.createBody(bodyDef);
+		FixtureDef fixtureDef = new FixtureDef();
+		Shape shape = getShape();
+		fixtureDef.shape = shape;
+		fixtureDef.isSensor = isSensor;
+		Fixture fixture = body.createFixture(fixtureDef);
+
+		entity = game.createEntity(body, getTexture());
+		UpdateComponent updateComp = game.engine.createComponent(UpdateComponent.class);
+		updateComp.updateable = this;
+		entity.add(updateComp);
+		entity.add(new IdComponent(id));
+
+		BodyInfo bodyInfo = new BodyInfo(body);
+		bodyInfo.mainFixture = fixture;
+		bodyInfo.entity = entity;
+		bodyInfo.origin = this;
+		body.setUserData(bodyInfo);
+		fixInfo = new FixtureInfo(fixture);
+		fixInfo.width = width;
+		fixInfo.height = height;
+		fixture.setUserData(fixInfo);
+		
+		Vector2 spawnPosition = getSpawnPosition().cpy();
+		spawnPosition.x += width;
+		spawnPosition.y += height;
+		body.setTransform(spawnPosition, 0);
+
+		shape.dispose();
+		alive = true;
+	}
+
+	protected Shape getShape() {
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(width / 2, height / 2);
+		return shape;
+	}
+
+	protected BodyDef getBodyDef() {
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = BodyType.DynamicBody;
+		bodyDef.fixedRotation = true;
+		bodyDef.bullet = isBullet();
+		return bodyDef;
+	}
+	
+	protected boolean isBullet() {
+		return false;
+	}
+
+	protected void destroy() {
+		if (alive) {
+			alive = false;
+			game.executeAfterNextUpdate(new Runnable() {
+
+				@Override
+				public void run() {
+					game.engine.removeEntity(entity);
+					game.world.destroyBody(body);
+					entity = null;
+					body = null;
+				}
+			});
+		}
+	}
+
+	protected TextureRegion getTexture() {
+		return InternalAssetLoader.getTexture(getTextureName());
+	}
+
+	protected abstract String getTextureName();
+
+	protected abstract Vector2 getSpawnPosition();
+
+}

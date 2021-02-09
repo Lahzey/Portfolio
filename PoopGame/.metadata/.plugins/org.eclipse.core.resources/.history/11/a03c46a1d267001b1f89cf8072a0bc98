@@ -1,0 +1,35 @@
+package poopgame.gamelogic;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import poopgame.gamelogic.engine.actions.ActionType;
+
+public class InputMap {
+
+	private final Map<Integer, ActionType> keyMapping = new HashMap<>();
+	private final Map<Integer, ActionType> mouseMapping = new HashMap<>();
+
+	public static final String MOVE_LEFT = "LEFT";
+	public static final String MOVE_RIGHT = "RIGHT";
+	public static final String JUMP = "JUMP";
+	public static final String POOP = "POOP";
+	public static final String SPECIAL = "SPECIAL";
+
+	public String getMouseMapping(int button) {
+		return mouseMapping.get(button);
+	}
+	
+	public void setMouseMapping(int button, String action) {
+		mouseMapping.put(button, action);
+	}
+
+	public String getKeyMapping(int keyCode) {
+		return keyMapping.get(keyCode);
+	}
+	
+	public void setKeyMapping(int keyCode, String action) {
+		mouseMapping.put(keyCode, action);
+	}
+
+}

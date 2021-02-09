@@ -1,0 +1,74 @@
+package poopgame.gamelogic;
+
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.sun.glass.events.KeyEvent;
+
+import poopgame.gamelogic.engine.actions.ActionType;
+
+public class InputMap {
+
+	private final Map<Integer, ActionType> keyMapping = new HashMap<>();
+	private final Map<Integer, ActionType> mouseMapping = new HashMap<>();
+	
+	public InputMap() {
+		// Initialise default values;
+		setKeyMapping(KeyEvent.VK_LEFT, ActionType.MOVE_LEFT_START);
+		setKeyMapping(KeyEvent.VK_RIGHT, ActionType.MOVE_LEFT_START);
+		setKeyMapping(KeyEvent.VK_SPACE, ActionType.MOVE_LEFT_START);
+		setMouseMapping(MouseEvent.BUTTON1, ActionType.MOVE_LEFT_START);
+		setMouseMapping(MouseEvent.BUTTON3, ActionType.MOVE_LEFT_START);
+	}
+
+	public ActionType getMouseMapping(int button) {
+		return mouseMapping.get(button);
+	}
+	
+	public void setMouseMapping(int button, ActionType actionType) {
+		mouseMapping.put(button, actionType);
+	}
+
+	public ActionType getKeyMapping(int keyCode) {
+		return keyMapping.get(keyCode);
+	}
+	
+	public void setKeyMapping(int keyCode, ActionType actionType) {
+		mouseMapping.put(keyCode, actionType);
+	}
+	
+	public void setMapping(int code, ActionType actionType, boolean isMouse) {
+		if (isMouse) {
+			mouseMapping.put(code, actionType);
+		} else {
+			mouseMapping.put(code, actionType);
+		}
+	}
+	
+	public int getMappedInput(ActionType actionType) {
+		for(int key : keyMapping.keySet()) {
+			if (keyMapping.get(key) == actionType) {
+				return key;
+			}
+		}
+
+		for(int button : mouseMapping.keySet()) {
+			if (mouseMapping.get(button) == actionType) {
+				return button;
+			}
+		}
+		
+		return -1;
+	}
+	
+	public boolean isMappedToMouse(ActionType actionType) {
+		for(int button : mouseMapping.keySet()) {
+			if (mouseMapping.get(button) == actionType) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+}

@@ -1,0 +1,5 @@
+package poopgame.gamelogic.abilities.passive;
+
+public abstract class PassiveAbility {
+
+}

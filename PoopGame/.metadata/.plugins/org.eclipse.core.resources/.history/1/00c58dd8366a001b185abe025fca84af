@@ -1,0 +1,53 @@
+package poopgame.gamelogic.abilities.special;
+
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+
+import poopgame.gamelogic.GameEntity;
+import poopgame.gamelogic.Poop;
+import poopgame.gamelogic.engine.TimeEngine;
+import poopgame.physics.components.BodyComponent;
+import util.GenericListener;
+
+public class NinjaSpecial extends SpecialAbility implements GenericListener<Poop> {
+	
+	private static final String LAST_POOP_STAT_NAME = "lastPoop";
+
+	@Override
+	public void cast(TimeEngine engine) {
+		Entity lastPoop = engine.getEntityById(player.getStats().getStat(LAST_POOP_STAT_NAME, String.class));
+		if (lastPoop != null) {
+			Body playerBody = player.getBody();
+			BodyComponent poopBodyComp = lastPoop.getComponent(BodyComponent.class);
+			Body poopBody = poopBodyComp != null ? poopBodyComp.body : null;
+			if (playerBody != null && poopBody != null) {
+				Vector2 playerPosition = playerBody.getTransform().getPosition();
+				float playerX = playerPosition.x;
+				float playerY = playerPosition.y;
+				float playerAngle = playerBody.getAngle();
+
+				Vector2 poopPosition = poopBody.getTransform().getPosition();
+				float pooprX = poopPosition.x;
+				float poopY = poopPosition.y;
+				float poopAngle = poopBody.getAngle();
+				
+				playerBody.setTransform(pooprX, poopY, poopAngle);
+				poopBody.setTransform(playerX, playerY, playerAngle);
+			}
+		} else {
+			player.getStats().setEnergy(100f);
+		}
+	}
+	
+	@Override
+	public void onShoot(TimeEngine engine, Entity player, Entity poop) {
+		GameEntity.getStats(player).setStat(LAST_POOP_STAT_NAME, poop.getId());
+	}
+
+	@Override
+	public void actionPerformed(Poop poop) {
+		System.out.println("setting last poop to " + poop.getId());
+	}
+
+}

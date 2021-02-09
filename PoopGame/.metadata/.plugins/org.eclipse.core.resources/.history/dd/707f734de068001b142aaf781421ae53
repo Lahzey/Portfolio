@@ -1,0 +1,13 @@
+package poopgame.server;
+
+public class LobbyUpdate {
+
+	public JoinRequest[] joinedPlayers;
+	
+	public LobbyUpdate() {}
+
+	public LobbyUpdate(JoinRequest... joinedPlayers) {
+		this.joinedPlayers = joinedPlayers;
+	}
+
+}

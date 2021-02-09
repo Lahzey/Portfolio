@@ -1,0 +1,24 @@
+package poopgame.gamelogic.abilities.special;
+
+import com.badlogic.gdx.audio.Sound;
+
+import poopgame.gamelogic.Bird;
+import poopgame.gamelogic.Player;
+import poopgame.util.InternalAssetLoader;
+
+public class TrumpSpecial extends SpecialAbility {
+
+	public TrumpSpecial(Player player) {
+		super(player);
+	}
+
+	private Sound sound = InternalAssetLoader.getSound("birdsound.mp3");
+
+	@Override
+	public void cast() {
+		Bird bird = new Bird(super.player);
+		bird.create(super.player.getGame());
+		sound.play();
+	}
+
+}

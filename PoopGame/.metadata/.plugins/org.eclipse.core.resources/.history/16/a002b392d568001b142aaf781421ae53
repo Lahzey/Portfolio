@@ -1,0 +1,5 @@
+package poopgame.server;
+
+public class ActionRequest {
+
+}

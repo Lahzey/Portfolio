@@ -1,0 +1,36 @@
+package poopgame.server;
+
+import com.creditsuisse.util.GeneralListener;
+
+import poopgame.gamelogic.Arena;
+import poopgame.gamelogic.Player;
+import poopgame.gamelogic.engine.actions.Action;
+
+public interface GameServer {
+
+	public static final int TCP_PORT = 29187;
+	public static final int UDP_PORT = TCP_PORT + 1;
+
+	public Arena getArena();
+	
+	public Player[] getPlayers();
+
+	long getStartTime();
+
+	public void addPlayer(Player player);
+
+	public void dispatchAction(Action action);
+	
+	public long estimateDelay();
+
+	public void addReceiver(ActionReceiver receiver);
+	
+	public void addLobbyUpdateListener(GeneralListener updateListener);
+
+	public void dispose();
+
+	public static interface ActionReceiver {
+		public void receive(ActionRequest actionRequest);
+	}
+
+}

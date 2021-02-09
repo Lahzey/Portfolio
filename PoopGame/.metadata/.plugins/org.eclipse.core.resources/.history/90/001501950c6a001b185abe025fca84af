@@ -1,0 +1,5 @@
+package poopgame.gamelogic.components;
+
+public class MovementComponent {
+
+}

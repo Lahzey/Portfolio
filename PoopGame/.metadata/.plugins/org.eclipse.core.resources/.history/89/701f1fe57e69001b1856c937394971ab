@@ -1,0 +1,85 @@
+package poopgame.server;
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.EntitySystem;
+
+import poopgame.gamelogic.engine.State;
+
+public class StateUpdate {
+	
+	public long time;
+
+	public int nextActionIndex;
+	
+	public List<Long> entityIds;
+	public Map<Long, List<String>> entityComponentTypes;
+	public Map<Long, Map<String, Object>> entityStates;
+	public Map<String, Object> systemStates;
+	
+	public StateUpdate() {}
+	
+	public StateUpdate(State state, long time) {
+		this.time = time;
+		this.nextActionIndex = state.nextActionIndex;
+		this.entityIds = state.entityIds;
+		
+		entityComponentTypes = new HashMap<>();
+		for (Long entityId : state.entityComponentTypes.keySet()) {
+			List<String> classNames = new ArrayList<>();
+			for (Class<? extends Component> componentType : state.entityComponentTypes.get(entityId)) {
+				classNames.add(componentType.getName());
+			}
+			entityComponentTypes.put(entityId, classNames);
+		}
+		
+		entityStates = new HashMap<>();
+		for (Long entityId : state.entityStates.keySet()) {
+			Map<String, Object> states = new HashMap<>();
+			for (Class<? extends Component> componentType : state.entityStates.get(entityId).keySet()) {
+				states.put(componentType.getName(), state.entityStates.get(entityId).get(componentType));
+			}
+			entityStates.put(entityId, states);
+		}
+		
+		systemStates = new HashMap<>();
+		for (Class<? extends EntitySystem> systemType : state.systemStates.keySet()) {
+			systemStates.put(systemType.getName(), state.systemStates.get(systemType));
+		}
+	}
+	
+	public State createState() {
+		State state = new State();
+		state.nextActionIndex = nextActionIndex;
+		state.entityIds = entityIds;
+		
+		state.entityComponentTypes = new HashMap<>();
+		for (Long entityId : state.entityComponentTypes.keySet()) {
+			List<Class<? extends Component>> componentTypes = new ArrayList<>();
+			for (String className : state.entityComponentTypes.get(entityId)) {
+				classNames.add(componentType.getName());
+			}
+			state.entityComponentTypes.put(entityId, classNames);
+		}
+		
+		state.entityStates = new HashMap<>();
+		for (Long entityId : state.entityStates.keySet()) {
+			Map<String, Object> states = new HashMap<>();
+			for (Class<? extends Component> componentType : state.entityStates.get(entityId).keySet()) {
+				states.put(componentType.getName(), state.entityStates.get(entityId).get(componentType));
+			}
+			state.entityStates.put(entityId, states);
+		}
+		
+		state.systemStates = new HashMap<>();
+		for (Class<? extends EntitySystem> systemType : state.systemStates.keySet()) {
+			state.systemStates.put(systemType.getName(), state.systemStates.get(systemType));
+		}
+	}
+	
+}

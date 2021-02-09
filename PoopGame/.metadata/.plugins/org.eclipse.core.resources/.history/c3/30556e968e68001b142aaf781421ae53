@@ -1,0 +1,11 @@
+package poopgame.gamelogic.abilities.special;
+
+import poopgame.gamelogic.Player;
+
+public abstract class SpecialAbility {
+
+	protected Player player;
+
+	public abstract void cast();
+
+}

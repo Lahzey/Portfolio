@@ -1,0 +1,21 @@
+package poopgame.gamelogic.components;
+
+import com.badlogic.ashley.core.Component;
+
+import poopgame.gamelogic.Champion;
+import poopgame.gamelogic.PassiveAbility;
+import poopgame.gamelogic.Stats;
+import poopgame.gamelogic.abilities.special.SpecialAbility;
+
+public class PlayerComponent implements Component {
+
+	public int id = 0;
+	public String name;
+	
+	public Champion champ;
+	public Stats stats;
+	
+	public SpecialAbility active;
+	public PassiveAbility passive;
+
+}

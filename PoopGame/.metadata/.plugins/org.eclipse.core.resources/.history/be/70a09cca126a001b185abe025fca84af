@@ -1,0 +1,47 @@
+package poopgame.gamelogic.components;
+
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.World;
+
+import poopgame.util.GifDecoder;
+
+public class MovementComponent extends LogicComponent {
+
+	public boolean moveLeft = false;
+	public boolean moveRight = false;
+
+	private String folderName;
+	private Animation<TextureRegion> walkLeft;
+	private Animation<TextureRegion> walkRight;
+	private Animation<TextureRegion> standLeft;
+	private Animation<TextureRegion> standRight;
+	
+	public MovementComponent() {}
+	
+	public MovementComponent(String folderName) {
+		this.folderName = folderName;
+	}
+	
+	private void loadAnimations() {
+		walkLeft = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal(folderName + "walk_left.gif").read());
+		walkRight = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal(folderName + "walk_right.gif").read());
+		standLeft = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal(folderName + "stand_left.gif").read());
+		standRight = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal(folderName + "stand_right.gif").read());
+	}
+
+	@Override
+	public Object storeState(Engine engine, World world) {
+		return new boolean[] { moveLeft, moveRight };
+	}
+
+	@Override
+	public void loadState(Object state, Engine engine, World world) {
+		boolean[] values = (boolean[]) state;
+		moveLeft = values[0];
+		moveRight = values[1];
+	}
+
+}

@@ -1,0 +1,16 @@
+package poopgame.gamelogic.abilities.special;
+
+import poopgame.gamelogic.Player;
+import poopgame.gamelogic.engine.TimeEngine;
+
+public abstract class SpecialAbility {
+
+	protected Player player;
+	
+	public SpecialAbility(Player player) {
+		this.player = player;
+	}
+
+	public abstract void cast(TimeEngine engine);
+
+}

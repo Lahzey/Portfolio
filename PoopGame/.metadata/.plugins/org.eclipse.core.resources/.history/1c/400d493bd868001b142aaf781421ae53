@@ -1,0 +1,26 @@
+package poopgame.server;
+
+
+import poopgame.gamelogic.Player;
+import poopgame.gamelogic.engine.actions.Action;
+
+public interface GameServer {
+	
+	public static final int TCP_PORT = 29187;
+	public static final int UDP_PORT = TCP_PORT + 1;
+	
+	public Player[] getPlayers();
+	
+	public void addPlayer(Player player);
+	
+	public void dispatchAction(Action action);
+	
+	public void addReceiver(ActionReceiver receiver);
+	
+	public void dispose();
+	
+	public static interface ActionReceiver {
+		public void receive(Action action);
+	}
+
+}

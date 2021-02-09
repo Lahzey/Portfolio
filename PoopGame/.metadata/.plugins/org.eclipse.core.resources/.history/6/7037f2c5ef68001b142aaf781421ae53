@@ -1,0 +1,21 @@
+package poopgame.server;
+
+import poopgame.gamelogic.Player;
+import poopgame.gamelogic.engine.actions.Action;
+import poopgame.gamelogic.engine.actions.ActionType;
+
+public class ActionRequest {
+
+	private long id;
+	private ActionType type;
+	private long playerId;
+	
+	private long actionTime;
+	
+	public ActionRequest() {}
+	
+	public ActionRequest(Action action) {
+		this.action = action;
+	}
+	
+}

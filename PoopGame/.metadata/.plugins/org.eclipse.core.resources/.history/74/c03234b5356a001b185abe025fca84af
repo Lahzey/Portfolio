@@ -1,0 +1,123 @@
+package poopgame.gamelogic;
+
+import java.awt.Image;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
+
+import poopgame.gamelogic.abilities.passive.KimPassive;
+import poopgame.gamelogic.abilities.passive.NinjaPassive;
+import poopgame.gamelogic.abilities.passive.PassiveAbility;
+import poopgame.gamelogic.abilities.passive.SnoopPassive;
+import poopgame.gamelogic.abilities.passive.TrumpPassive;
+import poopgame.gamelogic.abilities.special.KimSpecial;
+import poopgame.gamelogic.abilities.special.NinjaSpecial;
+import poopgame.gamelogic.abilities.special.SnoopSpecial;
+import poopgame.gamelogic.abilities.special.SpecialAbility;
+import poopgame.gamelogic.abilities.special.TrumpSpecial;
+
+public enum Champion {
+
+	TRUMP("TRUMP", 0.5f, 1f, TrumpSpecial.class, TrumpPassive.class),
+	KIM("KIM", 0.5f, 1f, KimSpecial.class, KimPassive.class),
+	SNOOP("SNOOP", 0.2f, 1f, SnoopSpecial.class, SnoopPassive.class),
+	NINJA("NINJA", 0.3f, 6f, NinjaSpecial.class, NinjaPassive.class);
+	
+	private final String name;
+	private final float width;
+	private final float height;
+	private final Class<? extends SpecialAbility> specialClass;
+	private final Class<? extends PassiveAbility> passiveClass;
+	
+	private Image splash;
+	private Image icon;
+	private Sound[] jumpSounds;
+	
+	private Champion(String name, float width, float height, Class<? extends SpecialAbility> specialClass, Class<? extends PassiveAbility> passiveClass) {
+		this.name = name;
+		this.width = width;
+		this.height = height;
+		this.specialClass = specialClass;
+		this.passiveClass = passiveClass;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public float getWidth() {
+		return width;
+	}
+	
+	public float getHeight() {
+		return height;
+	}
+	
+	public String getFolderName() {
+		return "champions/" + toString().toLowerCase() + "/";
+	}
+	
+	public Image getSplash() {
+		if (splash == null) {
+			try {
+				splash = ImageIO.read(Gdx.files.internal(getFolderName() + "splash.png").read());
+			} catch (IOException e) {
+				throw new RuntimeException("Failed to load splash art  for " + getName() + ".", e);
+			}
+		}
+		return splash;
+	}
+	
+	public Image getIcon() {
+		if (icon == null) {
+			try {
+				icon = ImageIO.read(Gdx.files.internal(getFolderName() + "icon.png").read());
+			} catch (IOException e) {
+				throw new RuntimeException("Failed to load icon for " + getName() + ".", e);
+			}
+		}
+		return icon;
+	}
+	
+	public Sound[] getJumpSounds() {
+		if (jumpSounds == null) {
+			List<Sound> sounds = new ArrayList<>();
+			int i = 1;
+			while(true) {
+				FileHandle fileHandle = Gdx.files.internal(getFolderName() + "jump_" + i + ".mp3");
+				if (fileHandle.exists()) {
+					sounds.add(Gdx.audio.newSound(fileHandle));
+				} else {
+					break;
+				}
+				i++;
+			}
+			jumpSounds = sounds.toArray(new Sound[sounds.size()]);
+		}
+		return jumpSounds;
+	}
+	
+	public SpecialAbility createSpecialAbility() {
+		try {
+			return specialClass.getConstructor().newInstance();
+		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new RuntimeException("Failed to initialize " + specialClass.getName() + ", must have an empty public constructor.");
+		}
+	}
+	
+	public PassiveAbility createPassiveAbility() {
+		try {
+			return passiveClass.getConstructor().newInstance();
+		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new RuntimeException("Failed to initialize " + passiveClass.getName() + ", must have an empty public constructor.");
+		}
+	}
+	
+}

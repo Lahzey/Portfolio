@@ -1,0 +1,220 @@
+package poopgame.gamelogic.engine;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.gdx.physics.box2d.World;
+
+import poopgame.gamelogic.components.LogicComponent;
+import poopgame.gamelogic.engine.actions.Action;
+
+public class TimeEngine extends Engine {
+
+	public static TimeEngine instance;
+
+	private long minActionId = 0;
+	private long maxActionId = Long.MAX_VALUE;
+	private long nextActionId = minActionId;
+	private Object[] actionIdLock = new Object[0];
+
+	private final World world;
+
+	private final StateStore stateStore = new StateStore(1000);
+	private final State initialState;
+
+	private final List<Action> actions = new ArrayList<>(); // all the actions that have ever happened or will happen, ordered by time
+	private final Map<Long, Action> actionIdMapping = new HashMap<>(); // used for quickly finding the previous version of an action
+	protected int nextActionIndex = 0;
+	
+	private Object[] actionLock = new Object[0];
+	private Object[] updateLock = new Object[0];
+
+	private long currentTime = System.currentTimeMillis();
+
+	public TimeEngine(World world) {
+		this.world = world;
+
+		initialState = new State(this);
+
+		instance = this;
+	}
+
+	public static TimeEngine getInstance() {
+		return instance;
+	}
+	
+	public void update() {
+		update(System.currentTimeMillis() - currentTime);
+	}
+	
+	@Override
+	public void update(float deltaSeconds) {
+		throw new IllegalAccessException("TimeEngine manages time deltas itself. Call update() to progress it.");
+	}
+
+	public void update(long deltaTime) {
+		updateInternal(deltaTime);
+	}
+
+	private void updateInternal(long deltaTime) {
+		if (nextActionIndex < actions.size()) {
+			Action nextAction = actions.get(nextActionIndex);
+			long nextActionTime = nextAction.getActionTime();
+			long nextActionDeltaTime = nextActionTime - currentTime;
+
+			if (nextActionDeltaTime < deltaTime) {
+				long leftOver = deltaTime - nextActionDeltaTime;
+				deltaTime = nextActionDeltaTime;
+				progressTime(deltaTime);
+				updateInternal(leftOver);
+			} else {
+				progressTime(deltaTime);
+			}
+		} else {
+			progressTime(deltaTime);
+		}
+	}
+
+	private void progressTime(long deltaTime) {
+		synchronized (updateLock) {
+			currentTime += deltaTime;
+			executeDueActions();
+
+			super.update(deltaTime / 1000f); // convert back to seconds
+
+			State currentState = new State(this);
+			stateStore.store(currentState, currentTime);
+		}
+	}
+
+	private void executeDueActions() {
+		while (nextActionIndex < actions.size()) {
+			Action nextAction = actions.get(nextActionIndex);
+			long nextActionTime = nextAction.getActionTime();
+
+			if (nextActionTime <= currentTime) {
+				System.out.println("executing action " + nextAction.getType() + " at " + nextActionTime);
+				nextAction.execute(this);
+				nextActionIndex++;
+			} else {
+				// all due actions have been executed, following are still in the future
+				break;
+			}
+		}
+	}
+
+	public void performAction(Action action) {
+		synchronized (actionLock) {
+			long actionTime = action.getActionTime();
+			long refreshTime = actionTime + 1; // small buffer to ensure local actions do not cause a refresh
+
+			long actionId = action.getId();
+			if (actionIdMapping.containsKey(actionId)) {
+				// this action has already been listed (and possibly executed), replacing with new version from server
+				Action existingAction = actionIdMapping.get(actionId);
+				long existingActionTime = existingAction.getActionTime();
+				System.out.println("repeating action " + action.getType() + " at " + actionTime + " (prev " + existingActionTime + ")");
+				if (actionTime != existingActionTime) {
+					actions.remove(existingAction);
+
+					if (existingActionTime < refreshTime) {
+						refreshTime = existingActionTime - 1;
+					}
+				} else {
+					// seems like this action has already been executed at the exact same time, no need for any adjustments
+					return;
+				}
+			} else {
+				actionIdMapping.put(actionId, action);
+			}
+
+			// add action at the correct index
+			if (actions.isEmpty()) {
+				actions.add(action);
+			} else {
+				for (int i = actions.size() - 1; i >= 0; i--) {
+					Action listedAction = actions.get(i);
+					if (listedAction.getActionTime() <= actionTime) {
+						actions.add(i + 1, action);
+						break;
+					}
+				}
+			}
+
+			if (refreshTime < currentTime) {
+				refresh(refreshTime);
+			}
+		}
+	}
+
+	/**
+	 * Rolls back the engine to the given time, then progresses it forward to the current time, executing all actions in between.
+	 * @param time the time to roll back to
+	 */
+	public void refresh(long time) {
+		System.out.println("refreshing from " + time);
+		setVisualsEnabled(false);
+		State state = stateStore.getState(time);
+		long stateTime;
+		if (state == null) {
+			state = initialState;
+			stateTime = 0;
+		} else {
+			stateTime = stateStore.getStateTime(state);
+		}
+
+		long timeDif = currentTime - stateTime;
+
+		state.restore();
+		world.step(0, 6, 2);
+		currentTime = stateTime;
+		update(timeDif);
+		setVisualsEnabled(true);
+	}
+
+	@Override
+	public void removeEntity(Entity entity) {
+		for (Component component : entity.getComponents()) {
+			if (component instanceof LogicComponent) {
+				((LogicComponent) component).onDestroy(this, world);
+			}
+		}
+		super.removeEntity(entity);
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
+	public long generateActionId() {
+		if (nextActionId > maxActionId) {
+			// should never happen, there are [ (2^63-1) / number of clients ] available IDs, so you could play for years without running out
+			throw new IllegalStateException("Action ID maximum has been reached");
+		}
+		long actionId;
+		synchronized (actionIdLock) {
+			actionId = nextActionId;
+			nextActionId++;
+		}
+		return actionId;
+	}
+
+	public long getTime() {
+		return currentTime;
+	}
+	
+	private void setVisualsEnabled(boolean enabled) {
+		for (EntitySystem system : getSystems()) {
+			if (system instanceof VisualSystem) {
+				((VisualSystem) system).setEnabled(enabled);
+			}
+		}
+	}
+
+}

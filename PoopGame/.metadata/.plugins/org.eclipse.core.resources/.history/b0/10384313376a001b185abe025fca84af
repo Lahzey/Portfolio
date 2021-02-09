@@ -1,0 +1,17 @@
+package poopgame.gamelogic.abilities.passive;
+
+import poopgame.gamelogic.Player;
+
+public class NinjaPassive extends PassiveAbility {
+
+	public NinjaPassive(Player player) {
+		super(player);
+	}
+
+	@Override
+	public void update(float deltaTime) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

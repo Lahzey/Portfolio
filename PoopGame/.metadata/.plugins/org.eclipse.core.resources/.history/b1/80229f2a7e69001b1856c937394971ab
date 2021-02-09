@@ -1,0 +1,79 @@
+package poopgame.server;
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.EntitySystem;
+
+import poopgame.gamelogic.engine.State;
+
+public class StateUpdate {
+
+	public int nextActionIndex;
+	
+	public List<Long> entityIds;
+	public Map<Long, List<String>> entityComponentTypes;
+	public Map<Long, Map<String, Object>> entityStates;
+	public Map<String, Object> systemStates;
+	
+	public long time;
+	
+	public StateUpdate() {}
+	
+	public StateUpdate(State state, long time) {
+		this.nextActionIndex = state.nextActionIndex;
+		this.entityIds = state.entityIds;
+		
+		entityComponentTypes = new HashMap<>();
+		for (Long entityId : state.entityComponentTypes.keySet()) {
+			List<String> classNames = new ArrayList<>();
+			for (Class<? extends Component> componentType : state.entityComponentTypes.get(entityId)) {
+				classNames.add(componentType.getName());
+			}
+			entityComponentTypes.put(entityId, classNames);
+		}
+		
+		entityStates = new HashMap<>();
+		for (Long entityId : state.entityStates.keySet()) {
+			Map<String, Object> states = new HashMap<>();
+			for (Class<? extends Component> componentType : state.entityStates.get(entityId).keySet()) {
+				states.put(componentType.getName(), state.entityStates.get(entityId).get(componentType));
+			}
+			entityStates.put(entityId, states);
+		}
+		
+		systemStates = new HashMap<>();
+		for (Class<? extends EntitySystem> systemType : state.systemStates.keySet()) {
+			systemStates.put(systemType.getName(), state.systemStates.get(systemType));
+		}
+//		this.systemStates = state.systemStates;
+		this.time = time;
+
+		for (Map<Class<? extends Component>, Object> stateMap : entityStates.values()) {
+			for (Object stateObject : stateMap.values()) {
+				System.out.println(stateObject.getClass());
+				if (stateObject instanceof Map) {
+					for(Object key : ((Map) stateObject).keySet()) {
+						System.out.println(key.getClass());
+						System.out.println(((Map) stateObject).get(key));
+					}
+				}
+			}
+		}
+		
+//		for (Object stateObject : systemStates.values()) {
+//			System.out.println(stateObject.getClass());
+//			if (stateObject instanceof Map) {
+//				for(Object key : ((Map) stateObject).keySet()) {
+//					System.out.println(key.getClass());
+//					System.out.println(((Map) stateObject).get(key));
+//				}
+//			}
+//		}
+	}
+	
+}

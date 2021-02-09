@@ -1,0 +1,39 @@
+package poopgame.gamelogic.abilities.passive;
+
+import com.badlogic.gdx.audio.Sound;
+
+import poopgame.gamelogic.AtomicPoop;
+import poopgame.util.InternalAssetLoader;
+
+public class KimPassive extends PassiveAbility {
+
+	private Sound sound = InternalAssetLoader.getSound("nuke.mp3");
+	private AtomicPoop poop;
+
+	public KimPassive() {
+		super(60000);
+	}
+
+	@Override
+	protected void cast() {
+		if (poop == null) {
+			poop = new AtomicPoop(super.player, new Runnable() {
+
+				@Override
+				public void run() {
+					KimPassive.super.lastCast = System.currentTimeMillis();
+					KimPassive.super.cooldown = 60000;
+					poop = null;
+				}
+
+			});
+			poop.create(super.player.getGame());
+			super.cooldown = 0;
+			sound.play();
+
+		} else {
+			poop.detonate();
+		}
+	}
+
+}

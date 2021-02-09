@@ -1,0 +1,17 @@
+package poopgame.gamelogic.abilities.passive;
+
+import poopgame.gamelogic.Player;
+
+public class KimPassive extends PassiveAbility {
+
+	public KimPassive(Player player) {
+		super(player);
+	}
+
+	@Override
+	public void update(float deltaTime) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

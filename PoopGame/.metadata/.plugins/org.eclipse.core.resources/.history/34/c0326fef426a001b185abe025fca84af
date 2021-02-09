@@ -1,0 +1,46 @@
+package poopgame.graphics.systems;
+
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.systems.IteratingSystem;
+
+import poopgame.gamelogic.engine.VisualSystem;
+import poopgame.graphics.components.AnimationComponent;
+import poopgame.graphics.components.TextureComponent;
+
+public class AnimationSystem extends IteratingSystem implements VisualSystem {
+
+    private ComponentMapper<TextureComponent> tm;
+    private ComponentMapper<AnimationComponent> am;
+    
+    private boolean enabled = true;
+
+    public AnimationSystem(){
+        super(Family.all(TextureComponent.class, AnimationComponent.class).get());
+        tm = ComponentMapper.getFor(TextureComponent.class);
+        am = ComponentMapper.getFor(AnimationComponent.class);
+    }
+    
+    @Override
+    public void update(float deltaTime) {
+    	if (!enabled) {
+    		return;
+    	}
+    	
+    	super.update(deltaTime);
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+        AnimationComponent ani = am.get(entity);
+        TextureComponent tex = tm.get(entity);
+        tex.region = ani.getKeyFrame(deltaTime);
+        System.out.println("set key from to " + tex.region);
+    }
+
+	@Override
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+}

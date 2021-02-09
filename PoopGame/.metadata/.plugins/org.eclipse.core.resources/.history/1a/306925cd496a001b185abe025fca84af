@@ -1,0 +1,11 @@
+package poopgame.util;
+
+public class Test {
+	
+	Object lock = new Object();
+
+	
+	public static void main(String[] args) {
+		sy
+	}
+}

@@ -1,0 +1,47 @@
+package poopgame.gamelogic.engine.actions;
+
+import java.util.Random;
+
+import poopgame.gamelogic.Player;
+import poopgame.gamelogic.engine.TimeEngine;
+
+public class Action {
+	
+	private static final Random RANDOM = new Random();
+	
+	private long id;
+	private ActionType type;
+	private long playerId;
+	
+	private long actionTime;
+	
+	public Action() {}
+	
+	public Action(ActionType type, long playerId, long actionTime) {
+		this.id = RANDOM.nextLong();
+		this.type = type;
+		this.playerId = playerId;
+		this.actionTime = actionTime;
+	}
+	
+	public void execute(TimeEngine engine, Player player) {
+		player.executeAction(this, engine);
+	}
+	
+	public long getId() {
+		return id;
+	}
+	
+	public ActionType getType() {
+		return type;
+	}
+	
+	public long getActionTime() {
+		return actionTime;
+	}
+
+	public void setActionTime(long actionTime) {
+		this.actionTime = actionTime;
+	}
+
+}

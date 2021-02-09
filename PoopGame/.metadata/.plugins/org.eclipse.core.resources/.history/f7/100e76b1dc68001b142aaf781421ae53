@@ -1,0 +1,15 @@
+package poopgame.server;
+
+import poopgame.gamelogic.Champion;
+
+public class LobbyUpdate {
+
+	public JoinRequest[] joinedPlayers;
+	
+	public LobbyUpdate() {}
+
+	public LobbyUpdate(JoinRequest... joinedPlayers) {
+		this.joinedPlayers = joinedPlayers;
+	}
+
+}

@@ -1,0 +1,22 @@
+package poopgame.server;
+
+import com.esotericsoftware.kryo.Kryo;
+
+import poopgame.gamelogic.Arena;
+import poopgame.gamelogic.Champion;
+import poopgame.gamelogic.engine.State;
+import poopgame.gamelogic.engine.actions.ActionType;
+
+public class RequestRegister {
+
+	public static Class<?>[] getRequestTypes() {
+		return new Class<?>[] { JoinRequest.class, LeaveRequest.class, LobbyUpdate.class, StartSignal.class, ActionRequest.class, StateUpdate.class, JoinRequest[].class, Champion.class, Arena.class, ActionType.class, State.class };
+	}
+
+	public static void registerAll(Kryo kryo) {
+		for (Class<?> type : getRequestTypes()) {
+			kryo.register(type);
+		}
+	}
+
+}

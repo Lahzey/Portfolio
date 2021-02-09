@@ -1,0 +1,41 @@
+package poopgame.gamelogic.components;
+
+import java.util.HashMap;
+
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
+
+import poopgame.gamelogic.Champion;
+import poopgame.gamelogic.Stats;
+import poopgame.gamelogic.abilities.passive.PassiveAbility;
+import poopgame.gamelogic.abilities.special.SpecialAbility;
+
+public class PlayerComponent extends LogicComponent {
+
+	public long id;
+	public String name;
+	
+	public Champion champ;
+	public Stats stats;
+	
+	public SpecialAbility special;
+	public PassiveAbility passive;
+	
+	public Vector2 spawnPosition = new Vector2();
+	
+	public PlayerComponent() {}
+	
+	@Override
+	public Object storeState(Engine engine, World world) {
+		return new HashMap<>(stats);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void loadState(Object state, Engine engine, World world) {
+		stats.clear();
+		stats.putAll((HashMap<String, Object>) state);
+	}
+
+}

@@ -1,0 +1,5 @@
+package poopgame.gamelogic.engine;
+
+public interface LogicSystem {
+
+}

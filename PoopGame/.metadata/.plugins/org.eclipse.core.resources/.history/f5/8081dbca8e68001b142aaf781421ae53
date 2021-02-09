@@ -1,0 +1,7 @@
+package poopgame.gamelogic.abilities.passive;
+
+public abstract class PassiveAbility {
+	
+	public abstract void update(float deltaTime);
+
+}
