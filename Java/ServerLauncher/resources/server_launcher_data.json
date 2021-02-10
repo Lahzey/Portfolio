@@ -1,0 +1,28 @@
+{
+  "tabs": [
+    {
+      "name": "DMX",
+      "items": {
+        "MIDDLE": {
+          "absolutePath": "\\\\CHCA6021.EUR.BELUNI.NET\\a469627$\\Documents\\workspace\\ServerLauncher\\resources\\DMB Start.lnk",
+          "type": "SERVER"
+        },
+        "TOP": {
+          "absolutePath": "\\\\CHCA6021.EUR.BELUNI.NET\\a469627$\\Documents\\workspace\\ServerLauncher\\resources\\WatchApp Start.cmd",
+          "type": "WATCHAPP"
+        },
+        "BOTTOM": {
+          "absolutePath": "\\\\CHCA6021.EUR.BELUNI.NET\\a469627$\\Documents\\workspace\\ServerLauncher\\resources\\DMF Start.lnk",
+          "type": "SERVER"
+        }
+      },
+      "changeListeners": []
+    },
+    {
+      "name": "MCU",
+      "items": {},
+      "changeListeners": []
+    }
+  ],
+  "currentTabIndex": 0
+}
