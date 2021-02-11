@@ -1,3 +1,5 @@
+Alle Desktop Applikationen können unter Releases gefunden werden.
+
 # Java
 ## PoopGame
 Dies ist ein Spiel das ich ursprünglich während eines 2 Wöchigen Kurses entwickelt habe.
@@ -34,6 +36,8 @@ Ich habe aber auch die Technologien verwendet, mit denen ich mich schon am beste
   - Framework: LibGDX
   - Physics: Box2D
   - UI: Java Swing
+    An sich nicht wieman es machen sollte (LibGDX hat sein eigenes UI, aber supported auch Swing), jedoch habe ich schon viel Erfahrung mit Java Swing und einige selbstgemachte Utilities dafür.
+    Zum Beispiel kann man F12 drücken, um das Userinterface zu debuggen (wie der Inspect von Browsern).
 
 Was mir wohl am meisten Schwierigkeiten bereitet hat waren die Animationen.
 Ich habe selbst kein Programm dafür und habe schlussendlich mit paint NET und einenm Plugin Frame nach Frame manuell editiert.
@@ -41,6 +45,25 @@ Die einzelnen Frames habe ich aus Bildern vom Internet zusammengestellt, da ich 
 
 Sounds hingegen waren viel simpler und sind grössten Teils selbst aufgenommen.
 
+## Bank City
+Dies war ein Spiel, das ich für die Schule entwickelt habe. Ich konnte es aber nie fertig stellen und war nach der Abgabe auch nich mehr motiviert daran weiterzuschaffen.
+Es ist ein City Builder (wie Cities Skylines oder SimCity), in dem man jedes Haus einzeln platziert.
+Alle Personen werden einzeln simuliert (haben / suchen einen Job und wohnen in einem Haus), jedoch hatte ich keine herumlaufende Menschen oder Strassen mit Autos.
+
+Ich denke, dass ich das Spiel an sich recht sauber geschrieben habe. Auch mit dem UI war ich recht zufrieden.
+Alle Grafiken habe ich selbst gemacht.
+Jedoch hatte ich Probleme mit den Resourcen:
+Ich wollte, dass einige Gebäude Resourcen Produzieren, aber auch konsumieren. Zum Beispiel produziert ein Kraftwerk Strom und konsumiert Wasser.
+Wenn nur 50% vom gebrauchten Wasser vorhanden ist, ist der Strom Output auch nur 50%. Hier lag aber das Problem:
+Nun war es möglich, dass Wasserpumpen auch nur noch einen Bruchteil produzieren, weil sie nicht mehr genug Strom haben. Dies senkt wiederum die Strom Produktion. Dies würde theoretisch endlos weitergehen.
+Generell war dieser Kreis von Abhänigkeiten ein Problem, dass ich damals nicht lösen konnte.
+In der Zwischenzeit habe ich realisiert, dass das System mit nur teilweis Produktiven Gebäuden nicht wirklich machbar ist. In anderen Spielen fällt ein Gebäude bei Mängeln einfach komplett aus.$
+
+Wenn ich mal Zeit habe würde ich gerne das Spiel fertig entwickeln, da ich an sich ein Stabiles Framework aufgebaut habe (das Hinzufügen von neuen Gebäuden war extrem einfach) und es schde ist, dass ich dies nicht wirklich ausnutzen konnte.
+
+## Sonstige Apps
+Ich habe sonst noch Applikationen gemacht, die ich für die Arbeit brauchen konnte (hat nichts mit Games zu tun).
+Diese sind auch bei den Releases zu finden.
 
 # C#
 ## Bloons TD 6 Assembly Browser
