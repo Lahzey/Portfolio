@@ -1,6 +1,25 @@
 Alle Desktop Applikationen können unter Releases gefunden werden.
 
 # Java
+## Hausaufgabe: No Contact
+Passend zur momentanen Situation mit Corona habe ich ein Spiel gemacht, bei dem der Spieler verhindern muss, dass Personen sich zu nahe kommen.
+Es erscheinen ständig Personen auf der linken und oberen Seite und laufen auf die gegenüberliegende Seite. Der Spieler kann ihnen befehlen, dabei einen Umweg zu nehmen und muss so verhindern, dass sie sich in den Weg kommen.
+Falls sich Personen zu nahe kommen, kann es sein, dass sie Infiziert werden. Je mehr infizierte, desto höher diese Chance.
+Wenn die Infektionsrate 100% erreicht, ist das Spiel verloren. Das Ziel ist möglichst lange zu spielen, bevor dies passiert.
+Es gibt verschiedene vorgefertigte Schwierigkeitsstufen, es können aber alle Einstellungen auch einzeln verändert werden.
+
+### Technologie
+Aus Zeitgründen habe ich für das Spiel nur Native Java verwendet. Dargestellt wird das ganze in Swing Component und gezeichnet mit AWT Graphics.
+Ein Eintity Component System ist nicht vorhanden und war für so simple Game-Logik auch nicht nötig.
+
+### Assets
+Einige Assets werden während Runtime generiert oder abgeändert.
+* Lauf-Animation der Personen: https://www.pinterest.co.uk/pin/682506518504852791/
+* Uhr Icon: FontAwesome (https://fontawesome.com/), direkt integriert in Java durch eine Library
+* Virus Icon: https://freeicons.io/viruses-icons-3/viruses-virus-icon-39038
+* Digital Font: https://allfont.net/download/ds-digital-bold/
+
+
 ## PoopGame
 Dies ist ein Spiel das ich ursprünglich während eines 2 Wöchigen Kurses entwickelt habe.
 Das Prinzip ist simpel:
