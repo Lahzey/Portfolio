@@ -1,5 +1,17 @@
 Alle Desktop Applikationen können unter Releases gefunden werden.
 
+- [Java](#java)
+  * [Hausaufgabe: No Contact](#hausaufgabe--no-contact)
+    + [Technologie](#technologie)
+    + [Assets](#assets)
+  * [PoopGame](#poopgame)
+    + [Meine Idee fürs Networking](#meine-idee-fürs-networking)
+    + [Sonstige Entwicklung](#sonstige-entwicklung)
+  * [Bank City](#bank-city)
+  * [Sonstige Apps](#sonstige-apps)
+- [C#](#c-)
+  * [Bloons TD 6 Assembly Browser](#bloons-td-6-assembly-browser)
+
 # Java
 ## Hausaufgabe: No Contact
 Passend zur momentanen Situation mit Corona habe ich ein Spiel gemacht, bei dem der Spieler verhindern muss, dass Personen sich zu nahe kommen.
