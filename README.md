@@ -1,4 +1,4 @@
-Alle Desktop Applikationen können unter Releases gefunden werden. Einige davon benötigen Java (min. 1.8.0).
+Alle Desktop Applikationen können unter Releases gefunden werden. Java wird benötig (min. 1.8.0).
 
 - [Java](#java)
   * [Hausaufgabe: No Contact](#hausaufgabe--no-contact)
