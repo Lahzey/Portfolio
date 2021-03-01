@@ -1,0 +1,92 @@
+package ui;
+
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
+import org.apache.commons.lang3.math.NumberUtils;
+
+import game.Difficulty;
+import game.Game;
+import graphics.swing.RoundedMatteBorder;
+import graphics.swing.colors.Backgrounds;
+import net.miginfocom.swing.MigLayout;
+
+public class MainMenu extends MenuPanel {
+	private static final long serialVersionUID = 1L;
+	
+	private MenuInput doorCount = new MenuInput(Game.DOOR_COUNT + "", SwingConstants.RIGHT);
+	private MenuInput moveSpeed = new MenuInput(Game.MOVE_SPEED + "", SwingConstants.RIGHT);
+	private MenuInput spawnCooldown = new MenuInput(Game.SPAWN_COOLDOWN + "", SwingConstants.RIGHT);
+
+	
+	public MainMenu() {
+		super(new MigLayout("fill, wrap 1", "50px[grow, fill]50px", "[grow, bottom]20px[]50px[grow, top]"));
+		setBackground(Color.BLACK);
+		
+		JPanel settingsPanel = new JPanel(new MigLayout("wrap 2", "[]20px[grow, fill]", ""));
+		settingsPanel.setOpaque(false);
+		settingsPanel.setBorder(BorderFactory.createLineBorder(new Color(100, 50, 0, 100), 5));
+		
+		settingsPanel.add(new MenuLabel("SETTINGS", 45f, SwingConstants.CENTER), "span 2, grow");
+		
+		JPanel difficultiesPanel = new JPanel(new MigLayout("fill", "[grow, fill]", ""));
+		difficultiesPanel.setOpaque(false);
+		for (Difficulty difficulty : Difficulty.values()) {
+			JButton button = new JButton(difficulty.name());
+			System.out.println(difficulty.name());
+			button.setFont(Assets.FONT.deriveFont(30f));
+			button.setBorder(new RoundedMatteBorder(2, button.getFontMetrics(button.getFont()).getHeight() / 2, difficulty.getBorderColor()));
+			button.setForeground(difficulty.getForegroundColor());
+			button.setOpaque(false);
+			button.setFocusPainted(false);
+			Backgrounds.set(button, difficulty.getBackgroundColor(), difficulty.getBackgroundColor().brighter(), difficulty.getBackgroundColor().darker());
+			difficultiesPanel.add(button);
+		}
+		settingsPanel.add(difficultiesPanel, "span 2, grow");
+		
+		settingsPanel.add(new MenuLabel("Amount of Doors"));
+		settingsPanel.add(doorCount);
+		
+		settingsPanel.add(new MenuLabel("Speed of People"));
+		settingsPanel.add(moveSpeed);
+		
+		settingsPanel.add(new MenuLabel("Spawn Cooldown in Milliseconds"));
+		settingsPanel.add(spawnCooldown);
+		
+		add(settingsPanel);
+		
+		add(new MenuButton("START", e -> start()));
+		add(new MenuButton("EXIT", e -> System.exit(0)));
+	}
+	
+	private void start() {
+		String doorCountInput = doorCount.getText();
+		String peopleSpeedInput = moveSpeed.getText();
+		String spawnCooldownInput = spawnCooldown.getText();
+		
+		if (!NumberUtils.isDigits(doorCountInput)) {
+			JOptionPane.showMessageDialog(this, doorCountInput + " is not a valid number!", "Invalid Input for Amount of Doors", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if (!NumberUtils.isDigits(peopleSpeedInput)) {
+			JOptionPane.showMessageDialog(this, peopleSpeedInput + " is not a valid number!", "Invalid Input for Speed of People", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if (!NumberUtils.isDigits(spawnCooldownInput)) {
+			JOptionPane.showMessageDialog(this, spawnCooldownInput + " is not a valid number!", "Invalid Input for Spawn Cooldown", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		Game.DOOR_COUNT = Integer.parseInt(doorCountInput);
+		Game.MOVE_SPEED = Integer.parseInt(peopleSpeedInput);
+		Game.SPAWN_COOLDOWN = Integer.parseInt(spawnCooldownInput);
+		
+		Frame.show(Frame.GAME_CONTAINER);
+	}
+	
+}

@@ -4,7 +4,7 @@ import java.awt.Cursor;
 
 import javax.swing.JButton;
 
-import graphics.swing.Foregrounds;
+import graphics.swing.colors.Foregrounds;
 
 public class MenuButton extends JButton {
 	private static final long serialVersionUID = 1L;

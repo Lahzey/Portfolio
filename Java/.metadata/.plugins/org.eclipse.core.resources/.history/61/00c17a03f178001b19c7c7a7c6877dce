@@ -1,0 +1,18 @@
+package ui;
+
+import java.awt.Color;
+
+import javax.swing.JLabel;
+
+public class MenuLabel extends JLabel {
+	private static final long serialVersionUID = 1L;
+	
+	private static Color TEXT = new Color(235, 146, 8);
+	
+	public MenuLabel(String text) {
+		super(text);
+		setForeground(TEXT);
+		setFont(getFont().deriveFont(30f));
+	}
+	
+}

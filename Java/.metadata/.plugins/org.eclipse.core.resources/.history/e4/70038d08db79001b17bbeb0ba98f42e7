@@ -1,0 +1,31 @@
+package ui;
+
+import java.awt.Color;
+
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+
+public class MenuLabel extends JLabel {
+	private static final long serialVersionUID = 1L;
+	
+	private static Color TEXT = new Color(179, 109, 0);
+	
+	public MenuLabel(String text) {
+		this(text, 30, SwingConstants.LEFT);
+	}
+	
+	public MenuLabel(String text, int horizontalAlignment) {
+		super(text);
+		setForeground(TEXT);
+		setFont(Assets.FONT.deriveFont(textSize));
+		setHorizontalAlignment(horizontalAlignment);
+	}
+	
+	public MenuLabel(String text, float textSize, int horizontalAlignment) {
+		super(text);
+		setForeground(TEXT);
+		setFont(Assets.FONT.deriveFont(textSize));
+		setHorizontalAlignment(horizontalAlignment);
+	}
+	
+}

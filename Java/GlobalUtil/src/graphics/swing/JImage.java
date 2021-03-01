@@ -268,7 +268,7 @@ public class JImage extends JLabel {
 	}
 
 	public void setIcon(Ikon icon, Color color) {
-		setImage(FontIcon.of(icon, getFont().getSize(), color).toImage());
+		setImage(FontIcon.of(icon, 100, color).toImage());
 	}
 
 	public void setIcon(Ikon icon, int size, Color color) {

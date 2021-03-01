@@ -15,9 +15,9 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 import com.badlogic.gdx.Gdx;
 
-import graphics.swing.Borders;
 import graphics.swing.JImage;
 import graphics.swing.SelectionPanel.SelectionDialog;
+import graphics.swing.colors.Borders;
 import net.miginfocom.swing.MigLayout;
 import poopgame.gamelogic.Arena;
 import poopgame.gamelogic.Champion;

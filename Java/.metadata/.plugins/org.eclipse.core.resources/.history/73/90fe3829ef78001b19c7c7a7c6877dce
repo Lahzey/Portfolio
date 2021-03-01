@@ -1,0 +1,88 @@
+package graphics.swing.colors;
+
+import java.awt.Style;
+import java.awt.Component;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import graphics.swing.SwingUtil;
+import util.GeneralListener;
+
+abstract class StyleSetter extends MouseAdapter implements FocusListener {
+
+		private Component component;
+
+		private Object normalStyle, hoveredStyle, clickedStyle, selectedStyle;
+
+		private GeneralListener changeListener;
+
+		private boolean isHovered;
+		private boolean isSelected;
+		private boolean isClicked;
+
+		public StyleSetter(Component component, Object normalStyle, Object hoveredStyle, Object clickedStyle, Object selectedStyle, GeneralListener changeListener) {
+			this.component = component;
+			this.normalStyle = normalStyle;
+			this.hoveredStyle = hoveredStyle;
+			this.clickedStyle = clickedStyle;
+			this.selectedStyle = selectedStyle;
+			this.changeListener = changeListener;
+
+			SwingUtil.addRecursiveMouseListener(component, this);
+			component.addFocusListener(this);
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			isClicked = false;
+			updateStyle();
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			isClicked = true;
+			updateStyle();
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			isHovered = false;
+			updateStyle();
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			isHovered = true;
+			updateStyle();
+		}
+
+		@Override
+		public void focusGained(FocusEvent e) {
+			isSelected = true;
+			updateStyle();
+		}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			isSelected = false;
+			updateStyle();
+		}
+
+		private void updateStyle() {
+			if (isClicked && clickedStyle != null) {
+				setStyle(component, clickedStyle);
+			} else if (isSelected && selectedStyle != null) {
+				setStyle(component, selectedStyle);
+			} else if (isHovered && hoveredStyle != null) {
+				setStyle(component, hoveredStyle);
+			} else {
+				setStyle(component, normalStyle);
+			}
+			if (changeListener != null) changeListener.actionPerformed();
+		}
+		
+		abstract void setStyle(Component component, Object color);
+
+	}

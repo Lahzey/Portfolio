@@ -6,8 +6,16 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
-		<item key="selection" value=""/>
+		<item key="selection" value="close"/>
 		<list key="findhistory">
+			<item value="close"/>
+			<item value="getScaled"/>
+			<item value="int"/>
+			<item value="gameSize"/>
+			<item value="Component"/>
+			<item value="Color"/>
+			<item value="final "/>
+			<item value="new MenuButton(&quot;START&quot;, e -&gt; System.out.println(&quot;start&quot;))"/>
 			<item value="com.creditsuisse."/>
 			<item value="com.creditsuisse"/>
 			<item value="super.update"/>
@@ -15,16 +23,12 @@
 			<item value=".class"/>
 			<item value="stats."/>
 			<item value="x"/>
-			<item value="X"/>
-			<item value="Long"/>
-			<item value="walking"/>
-			<item value="WALKING"/>
-			<item value="Walking"/>
-			<item value="system.out"/>
-			<item value="created"/>
-			<item value="animation"/>
 		</list>
 		<list key="replacehistory">
+			<item value="pixelSize"/>
+			<item value="JComponent"/>
+			<item value="Style"/>
+			<item value="Border"/>
 			<item value=""/>
 			<item value="stats"/>
 			<item value="()"/>
@@ -41,7 +45,7 @@
 		<item key="DIALOG_Y_ORIGIN" value="448"/>
 		<item key="DIALOG_WIDTH" value="284"/>
 		<item key="DIALOG_HEIGHT" value="391"/>
-		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.GotoLineAction$GotoLineDialog_dialogBounds">
 		<item key="DIALOG_X_ORIGIN" value="1049"/>

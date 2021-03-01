@@ -1,0 +1,44 @@
+package game;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+
+public class Entrance extends GameObject {
+	
+	private Color color;
+	private Exit exit;
+	
+	int personCount = 0;
+	
+	public Entrance(Color color, float x, float y) {
+		this.color = color;
+		setWidth(3);
+		setHeight(3);
+		setX(x);
+		setY(y);
+	}
+
+	public Color getColor() {
+		return color;
+	}
+	
+	public Exit getExit() {
+		return exit;
+	}
+
+	public void setExit(Exit exit) {
+		this.exit = exit;
+	}
+
+	@Override
+	public void update(long deltaTime) {
+		// TODO: spawns
+	}
+
+	@Override
+	public void render(Graphics2D graphics, int gameSize) {
+		graphics.setColor(color);
+		graphics.fillRect(getPixelMinX(gameSize), getPixelMinY(gameSize), getPixelWidth(gameSize), getPixelHeight(gameSize));
+	}
+
+}

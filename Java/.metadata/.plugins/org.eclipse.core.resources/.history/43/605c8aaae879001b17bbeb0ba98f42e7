@@ -1,0 +1,55 @@
+package ui;
+
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
+import javax.swing.border.Border;
+
+import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular;
+
+import graphics.swing.JAnimationPanel;
+import graphics.swing.JImage;
+import net.miginfocom.swing.MigLayout;
+
+public class GuidePanel extends JAnimationPanel {
+	private static final long serialVersionUID = 1L;
+
+	private static Color TEXT_COLOR = new Color(179, 109, 0);
+	
+	private JAnimationPanel content;
+	
+	public GuidePanel() {
+		super(new MigLayout("insets 50px, fill, wrap 2, hidemode 3", "[]20px[grow, fill]", "[][grow, fill]"));
+		setOpaque(false);
+		
+		generateContent();
+		
+		JImage infoButton = new JImage(FontAwesomeRegular.QUESTION_CIRCLE, TEXT_COLOR);
+		infoButton.setFont(Assets.FONT.deriveFont(30f));
+		infoButton.addActionListener(e -> toggleContent());
+		add(infoButton);
+		add(new MenuLabel("GUIDE", 40f));
+		
+		add(content, "span 2, grow");
+		content.setVisible(false);
+	}
+	
+	private void toggleContent() {
+		if (content.isVisible()) {
+			content.close(200, JAnimationPanel.VERTICAL);
+		} else {
+			content.open(200, JAnimationPanel.VERTICAL);
+		}
+	}
+	
+	private void generateContent() {
+		content = new JAnimationPanel(new MigLayout("insets 0, fill, wrap 1", "[grow, left]", ""));
+		content.setOpaque(false);
+		content.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, new Color(100, 50, 0, 100)), BorderFactory.createEmptyBorder(10, 10, 0, 0)));
+		
+		content.add(new MenuLabel("The goal of this game is to survive as long as possible by preventing people from touching each other.", 25f));
+		content.add(new MenuLabel("People will spawn from the left and top boxes and walk to the counterparts with the same color.", 25f));
+		content.add(new MenuLabel("You can make them take detours to avoid other people.", 25f));
+	}
+
+}

@@ -1,0 +1,53 @@
+package game;
+
+import java.awt.Color;
+
+public enum Difficulty {
+	
+	EASY(1, 1, 5000, 10, 20), MEDIUM(2, 1, 4000, 5, 30), HARD(3, 2, 3000, 0, 50);
+
+	private Color foregroundColor;
+	private Color backgroundColor;
+	private Color borderColor;
+	
+	private int doorCount;
+	private int moveSpeed;
+	private long spawnCooldown;
+	private int cureSpeed;
+	private int initialInfections;
+	
+	private Difficulty(Color foregroundColor, Color backgroundColor, Color borderColor, int doorCount, int moveSpeed, long spawnCooldown, int cureSpeed, int initialInfections) {
+		this.foregroundColor = foregroundColor;
+		this.backgroundColor = backgroundColor;
+		this.borderColor = borderColor;
+		this.doorCount = doorCount;
+		this.moveSpeed = moveSpeed;
+		this.spawnCooldown = spawnCooldown;
+		this.cureSpeed = cureSpeed;
+		this.initialInfections = initialInfections;
+	}
+	
+	
+	public Color getForegroundColor() {
+		return foregroundColor;
+	}
+
+
+	public Color getBackgroundColor() {
+		return backgroundColor;
+	}
+
+
+	public Color getBorderColor() {
+		return borderColor;
+	}
+
+
+	public void set() {
+		Game.DOOR_COUNT = doorCount;
+		Game.MOVE_SPEED = moveSpeed;
+		Game.SPAWN_COOLDOWN = spawnCooldown;
+		Game.CURE_SPEED = cureSpeed;
+		Game.INITIAL_INFECTION = initialInfections;
+	}
+}

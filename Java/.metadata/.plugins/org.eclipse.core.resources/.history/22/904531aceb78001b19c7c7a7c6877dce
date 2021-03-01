@@ -1,0 +1,27 @@
+package ui;
+
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.event.ActionListener;
+
+import javax.swing.JTextField;
+
+import graphics.swing.Backgrounds;
+
+public class MenuInput extends JTextField {
+	private static final long serialVersionUID = 1L;
+
+	private static Color DEFAULT = new Color(53, 35, 23, 100);
+	private static Color HOVERED = new Color(110, 45, 29, 100);
+	private static Color SELECTED = new Color(139, 31, 5, 100);
+	private static Color TEXT = new Color(235, 146, 8, 100);
+	
+	public MenuInput() {
+		Backgrounds.set(this, DEFAULT, HOVERED, CLICKED);
+		setForeground(TEXT);
+		setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		
+		addActionListener(actionListener);
+	}
+	
+}

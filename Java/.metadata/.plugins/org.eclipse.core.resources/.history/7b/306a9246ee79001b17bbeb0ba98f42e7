@@ -1,0 +1,11 @@
+package game;
+
+import java.awt.event.MouseEvent;
+
+public interface GameInputListener {
+	
+	public void mousePressed(MouseEvent e, int x, int y, int button);
+
+	public void mouseMoved(MouseEvent e, int x, int y);
+
+}

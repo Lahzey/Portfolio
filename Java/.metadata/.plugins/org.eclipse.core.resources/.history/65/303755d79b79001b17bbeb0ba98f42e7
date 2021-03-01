@@ -1,0 +1,42 @@
+package ui;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import graphics.ImageUtil;
+
+public class Assets {
+	
+	public static final Color VIRUS_COLOR = new Color(0, 89, 19);
+	
+	public static Image BACKGROUND = null;
+	public static Image VIRUS_ICON = null;
+	
+	public static Font FONT = null;
+	
+	static {
+		try {
+			BACKGROUND = ImageIO.read(new File("assets/led_pattern.jpg"));
+			BACKGROUND = ImageUtil.color(BACKGROUND, new Color(28, 17, 0), 255);
+
+			BACKGROUND = ImageIO.read(new File("assets/led_pattern.jpg"));
+			BACKGROUND = ImageUtil.color(BACKGROUND, new Color(28, 17, 0), 255);
+			
+
+			FONT = Font.createFont(Font.TRUETYPE_FONT, new File("assets/digital_bold.ttf"));
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			ge.registerFont(FONT);
+		} catch (IOException | FontFormatException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+
+}

@@ -1,0 +1,51 @@
+package game;
+
+import java.awt.Graphics2D;
+
+public abstract class GameObject {
+
+	private float x = 0;
+	private float y = 0;
+	private float width = 0;
+	private float height = 0;
+
+	public float getX() {
+		return x;
+	}
+
+	public void setX(float x) {
+		this.x = x;
+	}
+
+	public float getY() {
+		return y;
+	}
+
+	public float getPixelY(int gameSize) {
+		return y;
+	}
+
+	public void setY(float y) {
+		this.y = y;
+	}
+
+	public float getWidth() {
+		return width;
+	}
+
+	public void setWidth(float width) {
+		this.width = width;
+	}
+
+	public float getHeight() {
+		return height;
+	}
+
+	public void setHeight(float height) {
+		this.height = height;
+	}
+
+	public abstract void update(long deltaTime);
+
+	public abstract void render(Graphics2D graphics);
+}

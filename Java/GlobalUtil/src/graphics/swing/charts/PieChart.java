@@ -20,8 +20,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import graphics.swing.Backgrounds;
 import graphics.swing.WrapLayout;
+import graphics.swing.colors.Backgrounds;
 import net.miginfocom.swing.MigLayout;
 
 public class PieChart extends JPanel {

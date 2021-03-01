@@ -466,4 +466,8 @@ public class JAnimationPanel extends JPanel {
 			return new Dimension(staticSize.width >= 0 ? staticSize.width : superSize.width, staticSize.height >= 0 ? staticSize.height : superSize.height);
 		}
 	}
+	
+	public void setStaticSize(Dimension staticSize) {
+		staticSize.setSize(staticSize);
+	}
 }

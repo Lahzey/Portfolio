@@ -1,0 +1,57 @@
+package ui;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import graphics.swing.Inspector;
+import util.LoopThread;
+
+public class Frame extends JFrame {
+	private static final long serialVersionUID = 1L;
+	
+	private static final Frame INSTANCE = new Frame();
+	
+	public static final MainMenu MAIN_MENU = new MainMenu();
+	public static final MainMenu GAME_PANEL = new MainMenu();
+	
+	public Frame() {
+		JPanel focusDummy = new JPanel();
+		focusDummy.setPreferredSize(new Dimension());
+		focusDummy.setMaximumSize(new Dimension());
+		focusDummy.setOpaque(false);
+		focusDummy.setFocusable(true);
+		add(focusDummy, BorderLayout.NORTH);
+		
+		add(new MainMenu(), BorderLayout.CENTER);
+		setSize(new Dimension(1000, 1000));
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		new LoopThread(60) {
+			
+			@Override
+			public void loopedRun() {
+				if (isVisible()) {
+					repaint();
+				}
+			}
+		}.start();
+	}
+
+	
+	public static void main(String[] args) {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+		INSTANCE.setVisible(true);
+		
+		Inspector.setActive(true);
+	}
+}

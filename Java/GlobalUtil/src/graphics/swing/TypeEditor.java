@@ -48,6 +48,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 import graphics.ImageUtil;
 import graphics.swing.ColorChooserButton.ColorChangedListener;
 import graphics.swing.SelectionPanel.SelectionDialog;
+import graphics.swing.colors.Backgrounds;
 import net.miginfocom.swing.MigLayout;
 import util.ColorUtil;
 

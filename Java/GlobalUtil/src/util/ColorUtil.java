@@ -1,6 +1,7 @@
 package util;
 
 import java.awt.Color;
+import java.util.Random;
 
 public class ColorUtil {
 	
@@ -200,5 +201,16 @@ public class ColorUtil {
 			a /= colors.length;
 		}
 		return new Color(r, g, b, a);
+	}
+	
+	public static Color[] randomDistinctColors(Random random, int count) {
+		Color[] colors = new Color[count];
+		for(int i = 0; i < count; i++) {
+		    float hue = (1f / count) * i;
+		    float saturation = 0.6f + 0.2f * random.nextFloat();
+		    float brightness = 0.6f + 0.2f * random.nextFloat();
+		    colors[i] = Color.getHSBColor(hue, saturation, brightness);
+		}
+		return colors;
 	}
 }

@@ -1,0 +1,107 @@
+package graphics.swing;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import util.GeneralListener;
+
+public class Backgrounds {
+
+	public static void set(final Component c, final Color normalColor, final Color hoveredColor, final Color clickedColor) {
+		set(c, normalColor, hoveredColor, clickedColor, null);
+	}
+
+	public static void set(final Component c, final Color normalColor, final Color hoveredColor, final Color clickedColor, final GeneralListener changeListener) {
+		set(c, normalColor, hoveredColor, clickedColor, null, changeListener);
+	}
+
+	public static void set(final Component c, final Color normalColor, final Color hoveredColor, final Color clickedColor) {
+		set(c, normalColor, hoveredColor, clickedColor, null);
+	}
+
+	public static void set(final Component c, final Color normalColor, final Color hoveredColor, final Color clickedColor, final Color selectedColor, final GeneralListener changeListener) {
+		ColorSetter colorSetter = new ColorSetter(c, normalColor, hoveredColor, clickedColor, selectedColor, changeListener);
+		SwingUtil.addRecursiveMouseListener(c, colorSetter);
+		c.addFocusListener(colorSetter);
+		if (normalColor != null) {
+			c.setBackground(normalColor);
+		}
+	}
+
+	private static class ColorSetter extends MouseAdapter implements FocusListener {
+
+		private Component component;
+
+		private Color defaultColor, normalColor, hoveredColor, clickedColor, selectedColor;
+
+		private GeneralListener changeListener;
+
+		private boolean isHovered;
+		private boolean isSelected;
+		private boolean isClicked;
+
+		public ColorSetter(Component component, Color normalColor, Color hoveredColor, Color clickedColor, Color selectedColor, GeneralListener changeListener) {
+			this.defaultColor = component.getBackground();
+			this.normalColor = normalColor;
+			this.hoveredColor = hoveredColor;
+			this.clickedColor = clickedColor;
+			this.selectedColor = selectedColor;
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			isClicked = false;
+			updateColor();
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			isClicked = true;
+			updateColor();
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			isHovered = false;
+			updateColor();
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			isHovered = true;
+			updateColor();
+		}
+
+		@Override
+		public void focusGained(FocusEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		private void updateColor() {
+			if (isClicked && clickedColor != null) {
+				component.setBackground(clickedColor);
+			} else if (isSelected && selectedColor != null) {
+				component.setBackground(selectedColor);
+			} else if (isHovered && hoveredColor != null) {
+				component.setBackground(hoveredColor);
+			} else if (normalColor != null) {
+				component.setBackground(normalColor);
+			} else {
+				component.setBackground(defaultColor);
+			}
+			if (changeListener != null) changeListener.actionPerformed();
+		}
+
+	}
+}

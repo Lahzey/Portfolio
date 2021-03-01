@@ -25,11 +25,11 @@ import javax.imageio.ImageIO;
 import javax.swing.GrayFilter;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.SwingConstants;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
-@SuppressWarnings("restriction")
 public class ImageUtil {
 
 	/**
@@ -51,7 +51,7 @@ public class ImageUtil {
 	 */
 	public static Image getWidthScaledImage(Image original, int width){
 		double scale = (double) width / original.getWidth(null);
-		return original.getScaledInstance(width, (int)(original.getHeight(null) * scale), Image.SCALE_DEFAULT);
+		return original.getScaledInstance(width, (int)(original.getHeight(null) * scale), Image.SCALE_SMOOTH);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class ImageUtil {
 	 */
 	public static Image getHeightScaledImage(Image original, int height){
 		double scale = (double) height / original.getHeight(null);
-		return original.getScaledInstance((int)(original.getWidth(null) * scale), height, Image.SCALE_DEFAULT);
+		return original.getScaledInstance((int)(original.getWidth(null) * scale), height, Image.SCALE_SMOOTH);
 	}
 	
 	/**
@@ -491,11 +491,68 @@ public class ImageUtil {
 		int width = image.getWidth(null);
 		int height = image.getHeight(null);
 		int newWidth = width / 2;
-		int newHeight = width / 2;
+		int newHeight = height / 2;
 		int y = height / 10;
 		
 		BufferedImage result = new BufferedImage(newWidth, height, BufferedImage.TYPE_INT_ARGB);
 		result.createGraphics().drawImage(image, 0, y, newWidth, newHeight, null);
+		
+		return result;
+	}
+	
+	/**
+	 * Creates a new image with the given size, containing the given image at the same scale.
+	 * @param image the image to display
+	 * @param width the width of the new image
+	 * @param height the height of the new image
+	 * @param horizontalAlign how to align the image on the x axis, options are:<ul>
+	 * <li>{@link SwingConstants#LEFT}</li>
+	 * <li>{@link SwingConstants#CENTER}</li>
+	 * <li>{@link SwingConstants#RIGHT}</li></ul>
+	 * @param verticalAlign how to align the image on the y axis, options are:<ul>
+	 * <li>{@link SwingConstants#TOP}</li>
+	 * <li>{@link SwingConstants#CENTER}</li>
+	 * <li>{@link SwingConstants#BOTTOM}</li></ul>
+	 * @return a new image with the given size, containing the given image at the location defined by the alignment and with the original size (can be cut off).
+	 */
+	public static BufferedImage changeCanvasSize(Image image, int width, int height, int horizontalAlign, int verticalAlign) {
+		int originalWidth = image.getWidth(null);
+		int originalHeight = image.getHeight(null);
+		
+		// calculate new x
+		int x;
+		switch(horizontalAlign) {
+		case SwingConstants.LEFT:
+			x = 0;
+			break;
+		case SwingConstants.CENTER:
+			x = width / 2 - originalWidth / 2;
+			break;
+		case SwingConstants.RIGHT:
+			x = width - originalWidth;
+			break;
+		default:
+			throw new IllegalArgumentException(horizontalAlign + " is not a valid horizontalAlign.");
+		}
+		
+		// calculate new y
+		int y;
+		switch(verticalAlign) {
+		case SwingConstants.TOP:
+			y = 0;
+			break;
+		case SwingConstants.CENTER:
+			y = height / 2 - originalHeight / 2;
+			break;
+		case SwingConstants.BOTTOM:
+			y = height - originalHeight;
+			break;
+		default:
+			throw new IllegalArgumentException(verticalAlign + " is not a valid verticalAlign.");
+		}
+
+		BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		result.getGraphics().drawImage(image, x, y, null);
 		
 		return result;
 	}

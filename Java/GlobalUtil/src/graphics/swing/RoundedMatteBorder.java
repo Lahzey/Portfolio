@@ -59,8 +59,8 @@ public class RoundedMatteBorder extends PartialMatteBorder {
 	}
 
 
-	public RoundedMatteBorder(int width, int radius, Color color){
-		this(width, width, width, width, radius, radius, radius, radius, color);
+	public RoundedMatteBorder(int thickness, int radius, Color color){
+		this(thickness, thickness, thickness, thickness, radius, radius, radius, radius, color);
 	}
 	
 

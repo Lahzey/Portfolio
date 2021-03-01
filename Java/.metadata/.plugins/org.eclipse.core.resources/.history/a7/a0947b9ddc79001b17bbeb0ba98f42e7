@@ -1,0 +1,18 @@
+package game;
+
+public enum Difficulty {
+
+	private int doorCount;
+	private int moveSpeed;
+	private long spawnCooldown;
+	private int cureSpeed;
+	private int initialInfections;
+	
+	private Difficulty(int doorCount, int moveSpeed, long spawnCooldown, int cureSpeed, int initialInfections) {
+		this.doorCount = doorCount;
+		this.moveSpeed = moveSpeed;
+		this.spawnCooldown = spawnCooldown;
+		this.cureSpeed = cureSpeed;
+		this.initialInfections = initialInfections;
+	}
+}

@@ -1,0 +1,9 @@
+package game;
+
+public interface GameInputListener {
+	
+	public void mousePressed(int x, int y, int button);
+
+	public void mouseMoved(int x, int y);
+
+}

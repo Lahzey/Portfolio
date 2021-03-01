@@ -40,12 +40,12 @@ import javax.swing.text.Highlighter;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 import graphics.swing.AutoScrollPane;
-import graphics.swing.Backgrounds;
 import graphics.swing.HighlightWrapper;
 import graphics.swing.JAnimationPanel;
 import graphics.swing.JImage;
 import graphics.swing.NestedCheckBox;
 import graphics.swing.TextLineNumber;
+import graphics.swing.colors.Backgrounds;
 import util.ColorUtil;
 import util.ExtendedThread;
 
