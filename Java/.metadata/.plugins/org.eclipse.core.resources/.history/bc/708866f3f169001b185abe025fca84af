@@ -1,7 +1,0 @@
-package util;
-
-public class GenericListener<T> {
-
-	public void actionPerformed(T object);
-	
-}

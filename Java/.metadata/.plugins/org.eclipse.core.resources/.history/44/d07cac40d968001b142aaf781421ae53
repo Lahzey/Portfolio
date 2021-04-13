@@ -1,9 +1,0 @@
-package poopgame.server;
-
-public class RequestRegister {
-	
-	public Class<?>[] getRequestTypes() {
-		return 
-	}
-
-}

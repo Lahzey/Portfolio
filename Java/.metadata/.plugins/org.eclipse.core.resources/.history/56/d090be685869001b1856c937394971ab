@@ -1,8 +1,0 @@
-package poopgame.gamelogic.engine;
-
-public interface LogicSystem {
-
-	
-	public Object getState();
-	
-}

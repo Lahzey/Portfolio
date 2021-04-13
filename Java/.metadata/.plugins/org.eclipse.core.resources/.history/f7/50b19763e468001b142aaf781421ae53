@@ -1,7 +1,0 @@
-package poopgame.server;
-
-import poopgame.gamelogic.Champion;
-
-public class StartSignal {
-
-}

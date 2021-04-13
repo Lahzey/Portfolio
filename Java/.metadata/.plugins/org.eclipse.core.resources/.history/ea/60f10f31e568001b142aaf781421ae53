@@ -1,5 +1,0 @@
-package com.creditsuisse.util;
-
-public interface ChangeListener<T> {
-	public void onChange(T changed);
-}

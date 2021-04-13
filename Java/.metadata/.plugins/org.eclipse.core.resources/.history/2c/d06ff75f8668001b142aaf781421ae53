@@ -1,9 +1,0 @@
-package poopgame.ui;
-
-import java.awt.event.AWTEventListener;
-
-public abstract class InputProcessor implements AWTEventListener {
-
-	
-	
-}
