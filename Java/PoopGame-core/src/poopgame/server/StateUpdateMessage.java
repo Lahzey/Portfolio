@@ -11,7 +11,7 @@ import com.badlogic.ashley.core.EntitySystem;
 
 import poopgame.gamelogic.engine.State;
 
-public class StateUpdate {
+public class StateUpdateMessage {
 	
 	public long time;
 
@@ -22,9 +22,9 @@ public class StateUpdate {
 	public Map<String, Map<String, Object>> entityStates;
 	public Map<String, Object> systemStates;
 	
-	public StateUpdate() {}
+	public StateUpdateMessage() {}
 	
-	public StateUpdate(State state, long time) {
+	public StateUpdateMessage(State state, long time) {
 		this.time = time;
 		this.nextActionIndex = state.nextActionIndex;
 		this.entityIds = state.entityIds;

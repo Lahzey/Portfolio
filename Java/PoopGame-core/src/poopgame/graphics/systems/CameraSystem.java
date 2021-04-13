@@ -14,6 +14,7 @@ import poopgame.gamelogic.engine.VisualSystem;
 import poopgame.graphics.components.TransformComponent;
 
 public class CameraSystem extends IteratingSystem implements VisualSystem {
+	private static boolean ENABLED = false;
 
 	private static final float MIN_WIDTH = 10f;
 	private static final float MIN_HEIGHT = 5f;
@@ -50,7 +51,7 @@ public class CameraSystem extends IteratingSystem implements VisualSystem {
     	float maxX = Float.MIN_VALUE;
     	float maxY = Float.MIN_VALUE;
     	
-    	if(!mustRenderPositions.isEmpty()){
+    	if(!mustRenderPositions.isEmpty() && ENABLED){
         	// get smallest and biggest coordinate of all players
         	for(Vector3 position : mustRenderPositions){
         		if(position.x < minX) minX = position.x;

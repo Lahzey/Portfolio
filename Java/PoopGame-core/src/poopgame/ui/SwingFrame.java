@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
@@ -22,6 +23,9 @@ import javax.swing.UIManager;
 import com.badlogic.gdx.Gdx;
 
 import graphics.swing.Inspector;
+import graphics.swing.layouts.SwapLayout;
+import poopgame.util.InternalAssetLoader;
+import util.LoopThread;
 
 public class SwingFrame extends JFrame implements AWTEventListener {
 	private static final long serialVersionUID = 1L;
@@ -32,14 +36,16 @@ public class SwingFrame extends JFrame implements AWTEventListener {
 	private static SwingFrame INSTANCE = null;
 	private static final List<AWTEventListener> INPUT_PROCESSORS = new ArrayList<>();
 	
-	private JPanel contentPane = new JPanel(new BorderLayout());
-	
+//	private MigLayout contentLayout = new MigLayout("fill, wrap 1, insets 0", "[grow, fill]", "");
+	private SwapLayout contentLayout = new SwapLayout(200);
+	private JPanel contentPane = new JPanel(contentLayout);
+
+	private JPanel uiContainer;
 	private JPanel gameContainer;
 
-	public SwingFrame(JPanel gameContainer) {
+	public SwingFrame(JPanel gameWrapper) {
 		INSTANCE = this;
-		this.gameContainer = gameContainer;
-		add(contentPane, BorderLayout.CENTER);
+		setUIDefaults();
 		
 		// There is a Bug in Swing / AWT where if you remove all focusable components the focus system breaks and key events stop working
 		JPanel focusDummy = new JPanel();
@@ -47,9 +53,46 @@ public class SwingFrame extends JFrame implements AWTEventListener {
 		focusDummy.setMaximumSize(new Dimension());
 		focusDummy.setPreferredSize(new Dimension());
 		add(focusDummy, BorderLayout.SOUTH);
+		
+		MenuPanel loadingPanel = new MenuPanel("fill", "[grow, center]", "[grow, center]");
+		loadingPanel.add(new JLabel("Loading..."));
+		contentPane.add(loadingPanel);
+		
+		uiContainer = new JPanel(new BorderLayout());
+		uiContainer.add(new MainMenu());
+		contentPane.add(uiContainer);
+		
+		gameContainer = new JPanel(new BorderLayout());
+		gameContainer.add(gameWrapper);
+		contentPane.add(gameContainer);
 
+		add(contentPane, BorderLayout.CENTER);
+
+		getToolkit().addAWTEventListener(this, AWTEvent.MOUSE_EVENT_MASK | AWTEvent.KEY_EVENT_MASK);
 		Inspector.setActive(true);
-        
+		
+		new LoopThread(10) {
+			
+			@Override
+			public void loopedRun() {
+				if (InternalAssetLoader.isInitialised()) {
+					contentPane.remove(loadingPanel);
+					contentPane.revalidate();
+					contentPane.repaint();
+					terminate();
+				}
+			}
+		}.start();
+	}
+	
+	private void setShowGame(boolean showGame) {
+		int componentIndex = showGame ? 1 : 0;
+		if (contentLayout.getCurrentComponentIndex() != componentIndex) {
+			contentLayout.swap(contentPane, showGame ? 1 : 0);
+		}
+	}
+	
+	private static void setUIDefaults() {
 		UIDefaults uiDefaults = UIManager.getDefaults();
 		Font consolas = new Font("Consolas", Font.BOLD, 30);
 		uiDefaults.put("Label.font", consolas);
@@ -58,14 +101,16 @@ public class SwingFrame extends JFrame implements AWTEventListener {
 		uiDefaults.put("Button.foreground", FOREGROUND);
 		uiDefaults.put("TextField.foreground", FOREGROUND);
 		uiDefaults.put("TextField.font", consolas);
-        
-		contentPane.add(new MainMenu());
-		
-		getToolkit().addAWTEventListener(this, AWTEvent.MOUSE_EVENT_MASK | AWTEvent.KEY_EVENT_MASK);
 	}
 	
 	public static void showGame() {
-		goTo(INSTANCE.gameContainer);
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				INSTANCE.setShowGame(true);
+			}
+		});
 	}
 	
 	public static void goTo(JComponent menuComponent) {
@@ -73,10 +118,11 @@ public class SwingFrame extends JFrame implements AWTEventListener {
 			
 			@Override
 			public void run() {
-				INSTANCE.contentPane.removeAll();
-				INSTANCE.contentPane.add(menuComponent); // replaces current one because of BorderLayout
-				INSTANCE.revalidate();
-				INSTANCE.repaint();
+				INSTANCE.setShowGame(false);
+				INSTANCE.uiContainer.removeAll();
+				INSTANCE.uiContainer.add(menuComponent); // replaces current one because of BorderLayout
+				INSTANCE.uiContainer.revalidate();
+				INSTANCE.uiContainer.repaint();
 			}
 		});
 	}

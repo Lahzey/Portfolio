@@ -17,8 +17,10 @@ public class StateStore {
 	}
 
 	public void store(State state, long currentTime) {
-		states.add(state);
-		stateTimes.put(state, currentTime);
+		synchronized (states) {
+			states.add(state);
+			stateTimes.put(state, currentTime);
+		}
 		clearExpiredStates(currentTime);
 	}
 
@@ -75,28 +77,32 @@ public class StateStore {
 	}
 
 	private void clearExpiredStates(long currentTime) {
-		while (!states.isEmpty()) {
-			State state = states.get(0);
-			long stateTime = stateTimes.get(state);
-			if (stateTime < currentTime - storageDuration) {
-				states.remove(0);
-				stateTimes.remove(state);
-			} else {
-				break;
+		synchronized (states) {
+			while (!states.isEmpty()) {
+				State state = states.get(0);
+				long stateTime = stateTimes.get(state);
+				if (stateTime < currentTime - storageDuration) {
+					states.remove(0);
+					stateTimes.remove(state);
+				} else {
+					break;
+				}
 			}
 		}
 	}
 
 	public void deleteAfter(long time) {
-		int i = 0;
-		while (i < states.size()) {
-			State state = states.get(i);
-			long stateTime = stateTimes.get(state);
-			if (stateTime > time) {
-				states.remove(i);
-				stateTimes.remove(state);
-			} else {
-				i++;
+		synchronized (states) {
+			int i = 0;
+			while (i < states.size()) {
+				State state = states.get(i);
+				long stateTime = stateTimes.get(state);
+				if (stateTime > time) {
+					states.remove(i);
+					stateTimes.remove(state);
+				} else {
+					i++;
+				}
 			}
 		}
 	}

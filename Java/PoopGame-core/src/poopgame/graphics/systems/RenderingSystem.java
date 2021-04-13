@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import poopgame.gamelogic.components.PlayerComponent;
@@ -31,9 +32,9 @@ import poopgame.physics.FixtureInfo;
 import poopgame.physics.components.BodyComponent;
 import poopgame.util.InternalAssetLoader;
 
-public class RenderingSystem extends SortedIteratingSystem implements VisualSystem {
+public class RenderingSystem extends SortedIteratingSystem implements VisualSystem, Disposable {
 
-	private static final Texture BACKGROUND = new Texture(InternalAssetLoader.generateColoredImage(Color.BLACK, 1, 1));
+	private final Texture BACKGROUND = new Texture(InternalAssetLoader.generateColoredImage(Color.BLACK, 1, 1)); // making this static somehow breaks it
 
 	public final Rectangle mustRender = new Rectangle(); // this rectangle will always be rendered, this system may expand on it to fit screen size
 	private final Vector2 baseCoords = new Vector2();
@@ -69,7 +70,6 @@ public class RenderingSystem extends SortedIteratingSystem implements VisualSyst
 	@Override
 	public void update(float deltaTime) {
 		if (!enabled || mustRender.width == 0 || mustRender.height == 0) {
-			System.out.println("Cannot render");
 			return;
 		}
 
@@ -169,10 +169,6 @@ public class RenderingSystem extends SortedIteratingSystem implements VisualSyst
 		if (player != null && stats != null) {
 			batch.end();
 			shapeRenderer.begin(ShapeType.Filled);
-			
-			shapeRenderer.setColor(Color.RED);
-			shapeRenderer.rect(0, 0, 5, 5);
-			
 			shapeRenderer.setColor(Color.YELLOW);
 			shapeRenderer.rect(x, y + height + 0.05f, width * (stats.stats.getEnergy() / 100f), 0.03f);
 			shapeRenderer.setColor(Color.GREEN);
@@ -232,5 +228,11 @@ public class RenderingSystem extends SortedIteratingSystem implements VisualSyst
 	@Override
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	@Override
+	public void dispose() {
+		batch.dispose();
+		shapeRenderer.dispose();
 	}
 }

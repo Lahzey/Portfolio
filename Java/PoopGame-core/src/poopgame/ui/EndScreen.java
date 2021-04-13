@@ -6,17 +6,22 @@ import com.badlogic.ashley.core.Entity;
 
 import poopgame.gamelogic.components.PlayerComponent;
 import poopgame.server.GameServer;
+import poopgame.server.LocalServer;
 
-public class WinScreen extends MenuPanel {
+public class EndScreen extends MenuPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private GameServer server;
-	private Long activePlayerId;
+	private PlayerComponent activePlayer;
 
-	public WinScreen(Entity winner, GameServer server, Long activePlayerId) {
+	public EndScreen(Entity winner, GameServer server, PlayerComponent activePlayer) {
 		super("wrap 2, fill, insets 50", "[grow]50px[right]", "[grow, center][]");
 		this.server = server;
-		this.activePlayerId = activePlayerId;
+		this.activePlayer = activePlayer;
+		
+		if (server instanceof LocalServer) {
+			((LocalServer) server).removeAllPlayers();
+		}
 		
 		PlayerComponent winnerComp = winner != null ? winner.getComponent(PlayerComponent.class) : null;
 		JLabel winnerLabel = new JLabel(winner != null ?  winnerComp.name + " (" + winnerComp.champ.getName() + ") WON" : "TIE");
@@ -32,15 +37,7 @@ public class WinScreen extends MenuPanel {
 	}
 
 	private void returnToLobby() {
-		for (PlayerComponent player : server.getPlayers()) {
-			if (player.id == activePlayerId) {
-				SwingFrame.goTo(new Lobby(server, player));
-				return;
-			}
-		}
-		
-		// in case the player cannot be found again
-		showMainMenu();
+		SwingFrame.goTo(new Lobby(server, activePlayer));
 	}
 
 	private void showMainMenu() {

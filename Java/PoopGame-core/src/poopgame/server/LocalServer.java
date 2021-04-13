@@ -38,7 +38,7 @@ public class LocalServer extends Listener implements GameServer {
 			server.start();
 			server.bind(TCP_PORT, UDP_PORT);
 			server.addListener(this);
-		    RequestRegister.registerAll(server.getKryo());
+		    MessageRegister.registerAll(server.getKryo());
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to start local server.", e);
 		}
@@ -83,14 +83,20 @@ public class LocalServer extends Listener implements GameServer {
 		}
 		sendLobbyUpdate();
 	}
+
+	public void removeAllPlayers() {
+		playerMap.clear();
+		players.clear();
+		sendLobbyUpdate();
+	}
 	
 	private void sendLobbyUpdate() {
-		JoinRequest[] joinedPlayers = new JoinRequest[players.size()];
+		JoinMessage[] joinedPlayers = new JoinMessage[players.size()];
 		for (int i = 0; i < players.size(); i++) {
 			PlayerComponent joinedPlayer = players.get(i);
-			joinedPlayers[i] = new JoinRequest(joinedPlayer.id, joinedPlayer.name, joinedPlayer.champ);
+			joinedPlayers[i] = new JoinMessage(joinedPlayer.id, joinedPlayer.name, joinedPlayer.champ);
 		}
-		LobbyUpdate lobbyUpdate = new LobbyUpdate(arena, joinedPlayers);
+		LobbyMessage lobbyUpdate = new LobbyMessage(arena, joinedPlayers);
 		
 		for (Connection connection : server.getConnections()) {
 			connection.sendTCP(lobbyUpdate);
@@ -105,11 +111,16 @@ public class LocalServer extends Listener implements GameServer {
 	public long getStartTime() {
 		return startTime;
 	}
+	
+	@Override
+	public void resetStartTime() {
+		startTime = 0;
+	}
 
 	public void startLobby() {
-		startTime = System.currentTimeMillis();
+		startTime = System.currentTimeMillis() + 1000;
 		
-		StartSignal startSignal = new StartSignal(startTime);
+		StartMessage startSignal = new StartMessage(startTime);
 		for (Connection connection : server.getConnections()) {
 			connection.sendTCP(startSignal);
 		}
@@ -119,7 +130,7 @@ public class LocalServer extends Listener implements GameServer {
 			@Override
 			public void loopedRun() {
 				if (startTime > 0 && engine != null) {
-					StateUpdate stateUpdate = engine.createStateUpdate();
+					StateUpdateMessage stateUpdate = engine.createStateUpdate();
 					if (stateUpdate == null) {
 						return;
 					}
@@ -134,7 +145,7 @@ public class LocalServer extends Listener implements GameServer {
 	}
 
 	@Override
-	public void dispatchAction(ActionRequest actionRequest) {
+	public void dispatchAction(ActionMessage actionRequest) {
 		PoopGame.getInstance().executeAfterNextUpdate(() -> {
 			for (ActionReceiver actionReceiver : new ArrayList<>(actionReceivers)) {
 				actionReceiver.receive(actionRequest.action);
@@ -172,15 +183,15 @@ public class LocalServer extends Listener implements GameServer {
 	
 	@Override
 	public void received(Connection connection, Object object) {
-		if (object instanceof JoinRequest) {
-			JoinRequest joinRequest = (JoinRequest) object;
+		if (object instanceof JoinMessage) {
+			JoinMessage joinRequest = (JoinMessage) object;
 			PlayerComponent player = new PlayerComponent(joinRequest.playerId, joinRequest.name, joinRequest.champ); // input map not relevant for remote players
 			addPlayer(player);
-		} else if (object instanceof LeaveRequest) {
-			LeaveRequest leaveRequest = (LeaveRequest) object;
+		} else if (object instanceof LeaveMessage) {
+			LeaveMessage leaveRequest = (LeaveMessage) object;
 			removePlayer(leaveRequest.playerId);
-		} else if (object instanceof ActionRequest) {
-			ActionRequest actionRequest = (ActionRequest) object;
+		} else if (object instanceof ActionMessage) {
+			ActionMessage actionRequest = (ActionMessage) object;
 			dispatchAction(actionRequest);
 		}
 	}

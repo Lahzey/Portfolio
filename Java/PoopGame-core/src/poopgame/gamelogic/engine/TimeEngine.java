@@ -24,7 +24,7 @@ import poopgame.gamelogic.engine.actions.Action;
 import poopgame.graphics.components.TextureComponent;
 import poopgame.graphics.components.TransformComponent;
 import poopgame.physics.components.BodyComponent;
-import poopgame.server.StateUpdate;
+import poopgame.server.StateUpdateMessage;
 
 public class TimeEngine extends Engine implements Disposable {
 
@@ -53,18 +53,23 @@ public class TimeEngine extends Engine implements Disposable {
 		entitiesWithId = getEntitiesFor(Family.all(IdComponent.class).get());
 	}
 	
-	public StateUpdate createStateUpdate() {
+	public StateUpdateMessage createStateUpdate() {
 		State mostRecent = stateStore.getState(currentTime);
-		return mostRecent != null ? new StateUpdate(mostRecent, stateStore.getStateTime(mostRecent)) : null;
+		return mostRecent != null ? new StateUpdateMessage(mostRecent, stateStore.getStateTime(mostRecent)) : null;
 	}
 	
-	public void applyStateUpdate(StateUpdate stateUpdate) {
+	public void applyStateUpdate(StateUpdateMessage stateUpdate) {
 		State state = stateUpdate.createState();
 		state.timeEngine = this;
 		
 		stateStore.deleteAfter(stateUpdate.time - 1);
 		stateStore.store(state, stateUpdate.time);
 		refresh(stateUpdate.time);
+	}
+	
+	public void updatePaused() {
+		currentTime = System.currentTimeMillis();
+		super.update(1f);
 	}
 	
 	public void update() {

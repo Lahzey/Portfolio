@@ -11,10 +11,10 @@ import poopgame.gamelogic.Stats;
 import poopgame.gamelogic.engine.actions.Action;
 import poopgame.gamelogic.engine.actions.ActionType;
 
-public class RequestRegister {
+public class MessageRegister {
 
 	public static Class<?>[] getRequestTypes() {
-		return new Class<?>[] { JoinRequest.class, JoinRequest[].class, LeaveRequest.class, LobbyUpdate.class, StartSignal.class, ActionRequest.class, StateUpdate.class,
+		return new Class<?>[] { JoinMessage.class, JoinMessage[].class, LeaveMessage.class, LobbyMessage.class, StartMessage.class, ActionMessage.class, StateUpdateMessage.class,
 			Champion.class, Arena.class, Action.class, ActionType.class, HashMap.class, ArrayList.class, Stats.class, Object[].class, float[].class };
 	}
 

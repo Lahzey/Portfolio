@@ -8,8 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import graphics.swing.JImage;
-import graphics.swing.KeyChooseButton;
+import graphics.swing.components.JImage;
+import graphics.swing.components.KeyChooseButton;
 import poopgame.gamelogic.Champion;
 import poopgame.gamelogic.PoopGame;
 import poopgame.gamelogic.engine.actions.ActionType;

@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import poopgame.data.FileLocations;
 import poopgame.data.TextureManager;
 import poopgame.gamelogic.PoopGame;
+import poopgame.util.InternalAssetLoader;
 
 public class InGameStage extends Stage {
 
@@ -27,6 +28,8 @@ public class InGameStage extends Stage {
 		TEXTURE_MANAGER = new TextureManager();
 		SKIN = new Skin(Gdx.files.internal(FileLocations.SKINS + "/custom/custom.json"));
 		initInterface();
+
+		Gdx.app.postRunnable(() -> InternalAssetLoader.initAssets());
 	}
 
 	private void initInterface() {

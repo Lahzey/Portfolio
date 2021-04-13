@@ -18,7 +18,7 @@ import util.GeneralListener;
 public class RemoteServer extends Listener implements GameServer {
 	
 	private Client client = new Client(65536, 65536);
-	private PlayerComponent activePlayer = null;
+	private Long activePlayerId = null;
 
 	private Arena arena = Arena.SEWER;
 	private Map<Long, PlayerComponent> playerMap = new HashMap<Long, PlayerComponent>();
@@ -39,7 +39,7 @@ public class RemoteServer extends Listener implements GameServer {
 		client.start();
 		client.connect(60000, host, TCP_PORT, UDP_PORT);
 		client.addListener(this);
-	    RequestRegister.registerAll(client.getKryo());
+	    MessageRegister.registerAll(client.getKryo());
 	}
 	
 	@Override
@@ -66,9 +66,15 @@ public class RemoteServer extends Listener implements GameServer {
 	public long getStartTime() {
 		return startTime;
 	}
+	
+	@Override
+	public void resetStartTime() {
+		startTime = 0;
+	}
 
 	@Override
-	public void dispatchAction(ActionRequest actionRequest) {
+	public void dispatchAction(ActionMessage actionRequest) {
+		System.out.println(actionRequest.action.getClass().getName());
 		sendTimes.put(actionRequest.action.getId(), System.currentTimeMillis());
 		client.sendUDP(actionRequest);
 	}
@@ -90,8 +96,8 @@ public class RemoteServer extends Listener implements GameServer {
 
 	@Override
 	public void dispose() {
-		if (activePlayer != null) {
-			client.sendTCP(new LeaveRequest(activePlayer.id));
+		if (activePlayerId != null) {
+			client.sendTCP(new LeaveMessage(activePlayerId));
 		}
 		
 		client.stop();
@@ -99,21 +105,22 @@ public class RemoteServer extends Listener implements GameServer {
 
 	@Override
 	public void addPlayer(PlayerComponent player) {
-		if (activePlayer == null) {
-			activePlayer = player;
-			players.add(player);
-			playerMap.put(player.id, player);
-			client.sendTCP(new JoinRequest(player.id, player.name, player.champ));
-		}
+		activePlayerId = player.id;
+		players.add(player);
+		playerMap.put(player.id, player);
+		client.sendTCP(new JoinMessage(player.id, player.name, player.champ));
 	}
 	
 	@Override
 	public void received(Connection connection, Object object) {
-		if (object instanceof LobbyUpdate) {
-			LobbyUpdate lobbyUpdate = (LobbyUpdate) object;
+		if (object instanceof LobbyMessage) {
+			LobbyMessage lobbyUpdate = (LobbyMessage) object;
 			
 			players.clear();
-			for (JoinRequest joinedPlayer : lobbyUpdate.joinedPlayers) {
+			boolean containsActivePlayer = false;
+			for (JoinMessage joinedPlayer : lobbyUpdate.joinedPlayers) {
+				if (activePlayerId != null && joinedPlayer.playerId == activePlayerId) containsActivePlayer = true;
+				
 				PlayerComponent player;
 				if (playerMap.containsKey(joinedPlayer.playerId)) {
 					player = playerMap.get(joinedPlayer.playerId);
@@ -125,21 +132,22 @@ public class RemoteServer extends Listener implements GameServer {
 				}
 				players.add(player);
 			}
+			if (!containsActivePlayer) activePlayerId = null;
 			
 			arena = lobbyUpdate.arena;
 
 			for (GeneralListener lobbyUpdateListener : new ArrayList<>(lobbyUpdateListeners)) {
 				lobbyUpdateListener.actionPerformed();
 			}
-		} else if (object instanceof StartSignal) {
-			StartSignal startSignal = (StartSignal) object;
+		} else if (object instanceof StartMessage) {
+			StartMessage startSignal = (StartMessage) object;
 			startTime = startSignal.startTime;
 			
 			for (GeneralListener startListener : new ArrayList<>(startListeners)) {
 				startListener.actionPerformed();
 			}
-		} else if (object instanceof ActionRequest) {
-			ActionRequest actionRequest = (ActionRequest) object;
+		} else if (object instanceof ActionMessage) {
+			ActionMessage actionRequest = (ActionMessage) object;
 			
 			PoopGame.getInstance().executeAfterNextUpdate(() -> {
 				Long sendTime = sendTimes.remove(actionRequest.action.getId());
@@ -151,9 +159,11 @@ public class RemoteServer extends Listener implements GameServer {
 					actionReceiver.receive(actionRequest.action);
 				}
 			});
-		} else if (object instanceof StateUpdate) {
+		} else if (object instanceof StateUpdateMessage) {
 			if (engine != null) {
-				engine.applyStateUpdate((StateUpdate) object);
+				PoopGame.getInstance().executeAfterNextUpdate(() -> {
+					engine.applyStateUpdate((StateUpdateMessage) object);
+				});
 			}
 		}
 	}

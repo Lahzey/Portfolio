@@ -12,11 +12,37 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import poopgame.gamelogic.Champion;
+
 public class InternalAssetLoader {
+
+	// TODO: fix asset mapping, as currently when getting asset it results in a black box
 
 	private static final Map<String, Sound> SOUNDS = new HashMap<>();
 	private static final Map<String, TextureRegion> TEXTURES = new HashMap<>();
 	private static final Map<String, Animation<TextureRegion>> ANIMATIONS = new HashMap<>();
+	
+	private static boolean initialised = false;
+
+
+	public static void initAssets() {
+		if (initialised) {
+			return;
+		}
+		
+		for (Champion champ : Champion.values()) {
+			String folderName = champ.getFolderName();
+			InternalAssetLoader.getAnimation(folderName + "walk_left.gif");
+			InternalAssetLoader.getAnimation(folderName + "walk_right.gif");
+			InternalAssetLoader.getAnimation(folderName + "stand_left.gif");
+			InternalAssetLoader.getAnimation(folderName + "stand_right.gif");
+		}
+		initialised = true;
+	}
+	
+	public static boolean isInitialised() {
+		return initialised;
+	}
 
 	public static Sound getSound(String path) {
 		if (SOUNDS.containsKey(path)) {
@@ -58,8 +84,10 @@ public class InternalAssetLoader {
 	public static Animation<TextureRegion> getAnimation(String path, Animation.PlayMode playMode){
 		String key = path + ":" + playMode;
 		if (ANIMATIONS.containsKey(key)) {
+			System.out.println("loading animation " + path + " from ram");
 			return ANIMATIONS.get(key);
 		} else {
+			System.out.println("loading animation " + path + " from disk");
 			Animation<TextureRegion> animation;
 			try {
 				animation = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal(path).read());

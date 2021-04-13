@@ -29,7 +29,7 @@ import poopgame.graphics.systems.RenderingSystem;
 import poopgame.physics.FixtureInfo;
 import poopgame.physics.systems.PhysicsDebugSystem;
 import poopgame.physics.systems.PhysicsSystem;
-import poopgame.server.ActionRequest;
+import poopgame.server.ActionMessage;
 import poopgame.server.GameServer;
 import poopgame.server.GameServer.ActionReceiver;
 import poopgame.server.LocalServer;
@@ -37,7 +37,7 @@ import poopgame.tiledmap.TiledMapCollision;
 import poopgame.tiledmap.TiledMapRenderable;
 import poopgame.ui.InputAdapter;
 import poopgame.ui.SwingFrame;
-import poopgame.ui.WinScreen;
+import poopgame.ui.EndScreen;
 import poopgame.util.SystemPriorities;
 
 public class PoopGame extends InputAdapter implements ContactListener, ActionReceiver, Disposable {
@@ -53,15 +53,19 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 	public TimeEngine engine;
 
 	private GameServer server;
-	private Long activePlayerId;
-	
+	private PlayerComponent activePlayer;
+
 	public Vector2 mapDimensions = new Vector2();;
 
 	// Scheduled operations
 	private final List<Runnable> executeAfterNextUpdate = new ArrayList<>();
 	private final List<Runnable> executionQueue = new ArrayList<>();
+	private final List<Runnable> executeAsap = new ArrayList<>();
 
 	private boolean initialized = false;
+
+	private TiledMapRenderable tiledMapRenderable;
+	private RenderingSystem renderingSystem;
 
 	public static PoopGame getInstance() {
 		if (INSTANCE == null) {
@@ -76,10 +80,11 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 		world.setContactListener(this);
 
 		engine = new TimeEngine(world);
+		initSystems();
 	}
-	
+
 	private void initSystems() {
-		RenderingSystem renderingSystem = new RenderingSystem();
+		renderingSystem = new RenderingSystem();
 		engine.addSystem(renderingSystem);
 		engine.addSystem(new CameraSystem(renderingSystem));
 		engine.addSystem(new AnimationSystem());
@@ -97,10 +102,10 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 		this.server = server;
 	}
 
-	public void setActivePlayerId(Long playerId) {
-		this.activePlayerId = playerId;
+	public void setActivePlayer(PlayerComponent player) {
+		this.activePlayer = player;
 
-		if (playerId != null) {
+		if (player != null) {
 			SwingFrame.addInputProcessor(this);
 		} else {
 			SwingFrame.removeInputProcessor(this);
@@ -108,27 +113,51 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 	}
 
 	public void executeAfterNextUpdate(Runnable runnable) {
-		executeAfterNextUpdate.add(runnable);
+		synchronized (executeAfterNextUpdate) {
+			executeAfterNextUpdate.add(runnable);
+		}
+	}
+
+	public void executeAsap(Runnable runnable) {
+		synchronized (executeAsap) {
+			executeAsap.add(runnable);
+		}
+	}
+
+	private void executeRunnables(List<Runnable> runnables) {
+		synchronized (runnables) {
+			for (Runnable runnable : runnables) {
+				runnable.run();
+			}
+			runnables.clear();
+		}
 	}
 
 	public void step(float deltaTime) {
 		if (server == null) {
 			System.out.println("no server set");
 			return;
-		} else if (!initialized) {
-			initialize();
-		} else {
-			synchronized (executeAfterNextUpdate) {
-				executionQueue.addAll(executeAfterNextUpdate);
-				executeAfterNextUpdate.clear();
-			}
-			synchronized (engine) {
-				engine.update();
-			}
-			for (Runnable runnable : executionQueue)
-				runnable.run();
-			executionQueue.clear();
 		}
+
+		if (!initialized) {
+			initialize();
+		}
+		
+		if (server.getStartTime() <= 0 || server.getStartTime() > System.currentTimeMillis()) {
+			engine.updatePaused();
+			return;
+		}
+
+		synchronized (executeAfterNextUpdate) {
+			executionQueue.addAll(executeAfterNextUpdate);
+			executeAfterNextUpdate.clear();
+		}
+		executeRunnables(executeAsap);
+		synchronized (engine) {
+			engine.update();
+		}
+		executeRunnables(executeAsap);
+		executeRunnables(executionQueue);
 	}
 
 	private void initialize() {
@@ -140,17 +169,16 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 
 		System.out.println("Resetting engine");
 		engine.reset();
-		
-		System.out.println("Init Systems");
-		initSystems();
-
 
 		// Create Tiled Map
 		System.out.println("Loading Map: " + server.getArena().getMapPath());
 		TiledMap tiledMap = new TmxMapLoader().load(server.getArena().getMapPath());
-		TiledMapRenderable tiledMapRenderable = new TiledMapRenderable(tiledMap);
+		if (tiledMapRenderable == null) {
+			tiledMapRenderable = new TiledMapRenderable(tiledMap);
+		} else {
+			tiledMapRenderable.setMap(tiledMap);
+		}
 		tiledMapRenderable.setTileSize(TILE_SIZE);
-		RenderingSystem renderingSystem = engine.getSystem(RenderingSystem.class);
 		renderingSystem.renderBefore.add(tiledMapRenderable);
 		renderingSystem.getCamera().viewportWidth = tiledMapRenderable.getWidth();
 		renderingSystem.getCamera().viewportHeight = tiledMapRenderable.getHeight();
@@ -161,9 +189,8 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 
 		Vector2 mapDimensions = tiledMapCollision.getMapDimensions();
 		engine.getSystem(CameraSystem.class).setBounds(new Rectangle(0, 0, mapDimensions.x, mapDimensions.y));
-		
-		server.addReceiver(this);
 
+		server.addReceiver(this);
 
 		System.out.println("Spawning players");
 		int i = 0;
@@ -172,7 +199,7 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 			if (i >= spawnLocations.size()) {
 				i = 0;
 			}
-			System.out.println("Spawning player " + playerComp.name + " as " + playerComp.champ + " at " + spawnLocations.get(i));
+			System.out.println("Spawning player[" + playerComp.id + "] " + playerComp.name + " as " + playerComp.champ + " at " + spawnLocations.get(i));
 			Player player = new Player(playerComp);
 			player.create(engine, spawnLocations.get(i).cpy().add(player.width, player.height));
 			i++;
@@ -183,13 +210,30 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 		}
 
 		server.setEngine(engine);
-		
-		for(EntitySystem system : engine.getSystems()) {
+
+		for (EntitySystem system : engine.getSystems()) {
 			System.out.println(system.getClass().getName());
 		}
 
 		System.out.println("Init complete");
 		initialized = true;
+	}
+
+	@Override
+	public void dispose() {
+		synchronized (engine) {
+			setActivePlayer(null);
+
+			if (server != null) {
+				server.removeReceiver(this);
+				server.resetStartTime();
+				server = null;
+			}
+
+			initialized = false;
+			// TODO: Fix Bug where disposing world causes Client to crash
+//			engine.dispose();
+		}
 	}
 
 	@Override
@@ -222,77 +266,74 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 
 	}
 
-	public void dispose() {
-		synchronized (engine) {
-			setActivePlayerId(null);
-			server.removeReceiver(this);
-			server = null;
-			initialized = false;
-			// TODO: Fix Bug where disposing world causes Client to crash
-//			engine.dispose();
-		}
-	}
-
 	@Override
 	public void mousePressed(int mouseButton) {
-		ActionType actionType = INPUT_MAP.getMouseMapping(mouseButton);
-		if (actionType != null) {
-			Action action = new Action(actionType, activePlayerId, engine.getTime() + server.estimateDelay());
-			server.dispatchAction(new ActionRequest(action));
-			synchronized (engine) {
-				engine.dispatchAction(action);
+		executeAsap(() -> {
+			ActionType actionType = INPUT_MAP.getMouseMapping(mouseButton);
+			if (actionType != null && server != null && initialized) {
+				Action action = new Action(actionType, activePlayer.id, engine.getTime() + server.estimateDelay());
+				server.dispatchAction(new ActionMessage(action));
+				synchronized (engine) {
+					engine.dispatchAction(action);
+				}
 			}
-		}
+		});
 	}
 
 	@Override
 	public void mouseReleased(int mouseButton) {
-		ActionType actionType = INPUT_MAP.getMouseMapping(mouseButton);
-		if (actionType == ActionType.MOVE_LEFT_START) {
-			actionType = ActionType.MOVE_LEFT_END;
-		} else if (actionType == ActionType.MOVE_RIGHT_START) {
-			actionType = ActionType.MOVE_RIGHT_END;
-		} else if (actionType == ActionType.POOP_START) {
-			actionType = ActionType.POOP_END;
-		} else {
-			return; // this action type has no start-end processing
-		}
-		Action action = new Action(actionType, activePlayerId, engine.getTime() + server.estimateDelay());
-		server.dispatchAction(new ActionRequest(action));
-		synchronized (engine) {
-			engine.dispatchAction(action);
-		}
+		executeAsap(() -> {
+			ActionType actionType = INPUT_MAP.getMouseMapping(mouseButton);
+			if (actionType == ActionType.MOVE_LEFT_START) {
+				actionType = ActionType.MOVE_LEFT_END;
+			} else if (actionType == ActionType.MOVE_RIGHT_START) {
+				actionType = ActionType.MOVE_RIGHT_END;
+			} else if (actionType == ActionType.POOP_START) {
+				actionType = ActionType.POOP_END;
+			} else {
+				return; // this action type has no start-end processing
+			}
+			Action action = new Action(actionType, activePlayer.id, engine.getTime() + server.estimateDelay());
+			server.dispatchAction(new ActionMessage(action));
+			synchronized (engine) {
+				engine.dispatchAction(action);
+			}
+		});
 	}
 
 	@Override
 	public void keyPressed(int keyCode) {
-		ActionType actionType = INPUT_MAP.getKeyMapping(keyCode);
-		if (actionType != null) {
-			Action action = new Action(actionType, activePlayerId, engine.getTime() + server.estimateDelay());
-			server.dispatchAction(new ActionRequest(action));
-			synchronized (engine) {
-				engine.dispatchAction(action);
+		executeAsap(() -> {
+			ActionType actionType = INPUT_MAP.getKeyMapping(keyCode);
+			if (actionType != null) {
+				Action action = new Action(actionType, activePlayer.id, engine.getTime() + server.estimateDelay());
+				server.dispatchAction(new ActionMessage(action));
+				synchronized (engine) {
+					engine.dispatchAction(action);
+				}
 			}
-		}
+		});
 	}
 
 	@Override
 	public void keyReleased(int keyCode) {
-		ActionType actionType = INPUT_MAP.getKeyMapping(keyCode);
-		if (actionType == ActionType.MOVE_LEFT_START) {
-			actionType = ActionType.MOVE_LEFT_END;
-		} else if (actionType == ActionType.MOVE_RIGHT_START) {
-			actionType = ActionType.MOVE_RIGHT_END;
-		} else if (actionType == ActionType.POOP_START) {
-			actionType = ActionType.POOP_END;
-		} else {
-			return; // this action type has no start-end processing
-		}
-		Action action = new Action(actionType, activePlayerId, engine.getTime() + server.estimateDelay());
-		server.dispatchAction(new ActionRequest(action));
-		synchronized (engine) {
-			engine.dispatchAction(action);
-		}
+		executeAsap(() -> {
+			ActionType actionType = INPUT_MAP.getKeyMapping(keyCode);
+			if (actionType == ActionType.MOVE_LEFT_START) {
+				actionType = ActionType.MOVE_LEFT_END;
+			} else if (actionType == ActionType.MOVE_RIGHT_START) {
+				actionType = ActionType.MOVE_RIGHT_END;
+			} else if (actionType == ActionType.POOP_START) {
+				actionType = ActionType.POOP_END;
+			} else {
+				return; // this action type has no start-end processing
+			}
+			Action action = new Action(actionType, activePlayer.id, engine.getTime() + server.estimateDelay());
+			server.dispatchAction(new ActionMessage(action));
+			synchronized (engine) {
+				engine.dispatchAction(action);
+			}
+		});
 	}
 
 	@Override
@@ -307,7 +348,7 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 	}
 
 	public void goToWinScreen(Entity winner) {
-		SwingFrame.goTo(new WinScreen(winner, server, activePlayerId));
+		SwingFrame.goTo(new EndScreen(winner, server, activePlayer));
 		dispose();
 	}
 }

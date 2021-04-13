@@ -23,7 +23,7 @@ public interface GameServer {
 
 	public boolean hasPlayer(PlayerComponent player);
 
-	public void dispatchAction(ActionRequest actionRequest);
+	public void dispatchAction(ActionMessage actionRequest);
 	
 	public long estimateDelay();
 
@@ -34,6 +34,8 @@ public interface GameServer {
 	public void addLobbyUpdateListener(GeneralListener updateListener);
 	
 	public void removeLobbyUpdateListener(GeneralListener updateListener);
+
+	public void resetStartTime();
 
 	public void dispose();
 

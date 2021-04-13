@@ -2,13 +2,13 @@ package poopgame.server;
 
 import poopgame.gamelogic.engine.actions.Action;
 
-public class ActionRequest {
+public class ActionMessage {
 
 	public Action action;
 	
-	public ActionRequest() {}
+	public ActionMessage() {}
 	
-	public ActionRequest(Action action) {
+	public ActionMessage(Action action) {
 		this.action = action;
 	}
 	

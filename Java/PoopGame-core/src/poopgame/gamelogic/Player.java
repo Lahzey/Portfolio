@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
+import poopgame.gamelogic.components.IdComponent;
 import poopgame.gamelogic.components.MovementComponent;
 import poopgame.gamelogic.components.PlayerComponent;
 import poopgame.gamelogic.components.StatsComponent;
@@ -32,7 +33,7 @@ public class Player extends GameEntity {
 	private static final float MAX_CHARGE_DMG_AMP = 3f;
 	private static final float MAX_CHARGE_SPEED_AMP = 2.5f;
 
-	private PlayerComponent playerComponent = new PlayerComponent();
+	private PlayerComponent playerComponent;
 
 	public Player(PlayerComponent playerComponent) {
 		super(playerComponent.champ.getWidth(), playerComponent.champ.getHeight(), false);
@@ -106,6 +107,8 @@ public class Player extends GameEntity {
 		if (getStats(player).getHealth() <= 0) {
 			return;
 		}
+		
+		System.out.println("executing " + action.getType() + " for " + player.getComponent(IdComponent.class).id);
 		
 		MovementComponent movementComp = player.getComponent(MovementComponent.class);
 		AnimationComponent animationComp = player.getComponent(AnimationComponent.class);

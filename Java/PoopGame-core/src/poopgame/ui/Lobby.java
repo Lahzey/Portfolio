@@ -7,6 +7,7 @@ import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
@@ -15,9 +16,9 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 import com.badlogic.gdx.Gdx;
 
-import graphics.swing.JImage;
-import graphics.swing.SelectionPanel.SelectionDialog;
 import graphics.swing.colors.Borders;
+import graphics.swing.components.JImage;
+import graphics.swing.components.SelectionPanel.SelectionDialog;
 import net.miginfocom.swing.MigLayout;
 import poopgame.gamelogic.Arena;
 import poopgame.gamelogic.Champion;
@@ -36,6 +37,7 @@ public class Lobby extends MenuPanel {
 	
 	private GameServer server;
 	private PlayerComponent activePlayer;
+	private boolean joined;
 	
 	private JLabel arenaNameLabel;
 	private JImage arenaImage;
@@ -64,7 +66,6 @@ public class Lobby extends MenuPanel {
 		
 		playerList = new JPanel(new MigLayout("wrap 3, fill, insets 50", "[]20px[grow, fill]20px[]", ""));
 		playerList.setOpaque(false);
-		updateLobby();
 		add(playerList, "span 2, grow");
 		
 		MenuButton exitButton = new MenuButton("EXIT");
@@ -82,17 +83,27 @@ public class Lobby extends MenuPanel {
 		}
 
 		if (!server.hasPlayer(activePlayer)) {
+			System.out.println(activePlayer.name + " joining server...");
 			server.addPlayer(activePlayer);
 		}
 	}
 	
 	private void updateLobby() {
+		System.out.println("updating lobby [" + server.getPlayers() + "]");
+		boolean containsThisPlayer = false;
+		
 		playerList.removeAll();
 		for (PlayerComponent player : server.getPlayers()) {
+			if (player.id == activePlayer.id) containsThisPlayer = true;
+			
 			playerList.add(new JImage(player.champ.getIcon()));
 			playerList.add(new JLabel(player.name));
 			JImage kickButton = new JImage(FontAwesomeSolid.TIMES, ColorUtil.ERROR_FOREGROUND_COLOR);
-			kickButton.setEnabled((server instanceof LocalServer) && player.id != activePlayer.id);
+			kickButton.generateStateImages();
+			kickButton.setVisible((server instanceof LocalServer) && player.id != activePlayer.id);
+			kickButton.addActionListener(e -> {
+				if (server instanceof LocalServer) ((LocalServer) server).removePlayer(player.id);
+			});
 			playerList.add(kickButton);
 		}
 		playerList.revalidate();
@@ -100,6 +111,14 @@ public class Lobby extends MenuPanel {
 
 		arenaNameLabel.setText(server.getArena().getName());
 		arenaImage.setImage(server.getArena().getIcon());
+		
+		if (containsThisPlayer) {
+			joined = true;
+		} else if (joined) {
+			joined = false;
+			JOptionPane.showMessageDialog(this, "You have been removed from the Lobby.", "Kicked from Lobby", JOptionPane.ERROR_MESSAGE);
+			showMainMenu();
+		}
 	}
 	
 	private void changeArena() {
@@ -130,7 +149,7 @@ public class Lobby extends MenuPanel {
 		Gdx.app.postRunnable(() -> {
 			System.out.println("Setting Server & Player[" + activePlayer.id + "]...");
 			PoopGame.getInstance().setServer(server);
-			PoopGame.getInstance().setActivePlayerId(activePlayer.id);
+			PoopGame.getInstance().setActivePlayer(activePlayer);
 		});
 	}
 	
