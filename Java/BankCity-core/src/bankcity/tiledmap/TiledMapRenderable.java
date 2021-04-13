@@ -10,7 +10,7 @@ import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 
 import bankcity.graphics.systems.RenderingSystem.Renderable;
 
-public class TiledMapRenderable extends OrthogonalTiledMapRenderer implements Renderable{
+public class TiledMapRenderable extends OrthogonalTiledMapRenderer implements Renderable {
 
 	public TiledMapRenderable(TiledMap tiledMap){
 		super(tiledMap);

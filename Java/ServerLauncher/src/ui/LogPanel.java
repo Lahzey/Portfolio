@@ -39,13 +39,13 @@ import javax.swing.text.Highlighter;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
-import graphics.swing.AutoScrollPane;
 import graphics.swing.HighlightWrapper;
-import graphics.swing.JAnimationPanel;
-import graphics.swing.JImage;
-import graphics.swing.NestedCheckBox;
 import graphics.swing.TextLineNumber;
 import graphics.swing.colors.Backgrounds;
+import graphics.swing.components.AutoScrollPane;
+import graphics.swing.components.JAnimationPanel;
+import graphics.swing.components.JImage;
+import graphics.swing.components.NestedCheckBox;
 import util.ColorUtil;
 import util.ExtendedThread;
 

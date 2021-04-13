@@ -20,8 +20,8 @@ import javax.swing.KeyStroke;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import graphics.swing.JImage;
-import graphics.swing.SearchField;
+import graphics.swing.components.JImage;
+import graphics.swing.components.SearchField;
 import util.Selectable;
 
 import net.miginfocom.swing.MigLayout;

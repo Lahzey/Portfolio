@@ -20,8 +20,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import graphics.swing.FileTextField;
-
+import graphics.swing.components.FileTextField;
 import main.SearchConfig;
 import net.miginfocom.swing.MigLayout;
 import search.Index;

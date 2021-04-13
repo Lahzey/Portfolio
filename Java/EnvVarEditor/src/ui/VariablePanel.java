@@ -36,8 +36,8 @@ import javax.swing.event.DocumentListener;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import graphics.swing.JImage;
 import graphics.swing.colors.Backgrounds;
+import graphics.swing.components.JImage;
 import util.ColorUtil;
 
 import logic.Registry;

@@ -9,8 +9,7 @@ import javax.swing.JPanel;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import graphics.swing.ScaledImageButton;
-
+import graphics.swing.components.ScaledImageButton;
 import logic.Registry;
 import logic.RegistryException;
 import logic.Variable.VariableScope;

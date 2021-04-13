@@ -32,9 +32,9 @@ import javax.swing.UIManager;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import graphics.ImageUtil;
-import graphics.swing.CollapsibleTextPane;
 import graphics.swing.Inspector;
-import graphics.swing.JLamp;
+import graphics.swing.components.CollapsibleTextPane;
+import graphics.swing.components.JLamp;
 import util.ListUtil;
 import util.LoopThread;
 

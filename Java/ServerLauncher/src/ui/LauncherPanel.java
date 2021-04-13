@@ -29,10 +29,10 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import graphics.swing.DashedBorder;
-import graphics.swing.DragGridPane;
 import graphics.swing.FileDrop;
-import graphics.swing.JAnimationPanel;
-import graphics.swing.JAnimationPanel.AnimationCallback;
+import graphics.swing.components.DragGridPane;
+import graphics.swing.components.JAnimationPanel;
+import graphics.swing.components.JAnimationPanel.AnimationCallback;
 import util.ColorUtil;
 
 import logic.FileLaunchable;

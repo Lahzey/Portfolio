@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import game.Game;
-import graphics.swing.JImage;
+import graphics.swing.components.JImage;
 import net.miginfocom.swing.MigLayout;
 
 public class GameContainer extends MenuPanel implements AWTEventListener, MouseListener, MouseMotionListener {

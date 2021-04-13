@@ -11,8 +11,8 @@ import javax.swing.SwingConstants;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import graphics.swing.DurationInputField;
-import graphics.swing.NestedCheckBox;
+import graphics.swing.components.DurationInputField;
+import graphics.swing.components.NestedCheckBox;
 import util.ColorUtil;
 import com.github.lgooddatepicker.components.DateTimePicker;
 

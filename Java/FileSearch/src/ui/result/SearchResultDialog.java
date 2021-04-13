@@ -10,7 +10,7 @@ import java.io.File;
 
 import javax.swing.JDialog;
 
-import graphics.swing.TextProgressBar;
+import graphics.swing.components.TextProgressBar;
 import util.ExtendedThread;
 
 import net.miginfocom.swing.MigLayout;

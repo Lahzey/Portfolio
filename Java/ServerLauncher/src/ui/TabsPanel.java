@@ -11,8 +11,8 @@ import javax.swing.JFileChooser;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 
-import graphics.swing.TabbedPane;
-import graphics.swing.TextFieldFileChooser;
+import graphics.swing.components.TabbedPane;
+import graphics.swing.components.TextFieldFileChooser;
 import util.ObjectStore;
 import util.zip.ZipRootFile;
 

@@ -10,8 +10,8 @@ import javax.swing.JTextArea;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular;
 
-import graphics.swing.JAnimationPanel;
-import graphics.swing.JImage;
+import graphics.swing.components.JAnimationPanel;
+import graphics.swing.components.JImage;
 import net.miginfocom.swing.MigLayout;
 
 public class GuidePanel extends JAnimationPanel {

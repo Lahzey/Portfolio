@@ -21,10 +21,10 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 import graphics.swing.FileDrop;
 import graphics.swing.FileDrop.Listener;
-import graphics.swing.JAnimationPanel;
-import graphics.swing.JImage;
-import graphics.swing.NestedCheckBox;
-import graphics.swing.TextProgressBar;
+import graphics.swing.components.JAnimationPanel;
+import graphics.swing.components.JImage;
+import graphics.swing.components.NestedCheckBox;
+import graphics.swing.components.TextProgressBar;
 import util.ColorUtil;
 import util.StringFormatter;
 import util.StringUtil;

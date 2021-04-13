@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 
 import graphics.swing.DashedBorder;
 import graphics.swing.FileDrop;
-import graphics.swing.JAnimationPanel;
+import graphics.swing.components.JAnimationPanel;
 import util.ColorUtil;
 
 import net.miginfocom.swing.MigLayout;

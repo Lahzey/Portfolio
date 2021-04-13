@@ -17,12 +17,12 @@ import javax.swing.event.DocumentListener;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
-import graphics.swing.CollapsibleTextPane;
 import graphics.swing.FileDrop;
 import graphics.swing.FileDrop.Listener;
-import graphics.swing.JImage;
-import graphics.swing.TextFieldFileChooser;
-import graphics.swing.TextProgressBar;
+import graphics.swing.components.CollapsibleTextPane;
+import graphics.swing.components.JImage;
+import graphics.swing.components.TextFieldFileChooser;
+import graphics.swing.components.TextProgressBar;
 import util.ColorUtil;
 import util.LoopThread;
 import util.StringFormatter;

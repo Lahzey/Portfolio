@@ -15,7 +15,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
-import graphics.swing.TextFieldFileChooser;
+import graphics.swing.components.TextFieldFileChooser;
 import util.ColorUtil;
 
 import logic.FileLaunchable;

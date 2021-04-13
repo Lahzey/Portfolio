@@ -34,9 +34,9 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import graphics.ImageUtil;
-import graphics.swing.JAnimationPanel;
-import graphics.swing.JImage;
-import graphics.swing.JLamp;
+import graphics.swing.components.JAnimationPanel;
+import graphics.swing.components.JImage;
+import graphics.swing.components.JLamp;
 import util.ColorUtil;
 import util.ExtendedThread;
 import util.LoopThread;

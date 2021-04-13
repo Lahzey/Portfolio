@@ -22,8 +22,8 @@ import javax.swing.UIManager;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import graphics.swing.JImage;
-import graphics.swing.ScaledMenuItem;
+import graphics.swing.components.JImage;
+import graphics.swing.components.ScaledMenuItem;
 import util.ColorUtil;
 import util.Selectable;
 import util.zip.ZipEntryFile;
