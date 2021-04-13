@@ -52,6 +52,9 @@ import org.kordamp.ikonli.swing.FontIcon;
 
 import graphics.HollowRectangle;
 import graphics.ImageUtil;
+import graphics.swing.components.JImage;
+import graphics.swing.components.MouseEventBlocker;
+import graphics.swing.components.TypeEditor;
 import net.miginfocom.swing.MigLayout;
 import util.ColorUtil;
 import util.GetterSetterAccess;

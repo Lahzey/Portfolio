@@ -17,7 +17,7 @@ import javax.swing.JToolTip;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import graphics.swing.ContainerToolTip;
+import graphics.swing.components.ContainerToolTip;
 import net.miginfocom.swing.MigLayout;
 
 public class BarChart extends JPanel {
