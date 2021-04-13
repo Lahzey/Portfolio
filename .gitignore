@@ -1,2 +1,4 @@
-Java/.metadata/
+.metadata/
 bin/
+.project
+.classpath
