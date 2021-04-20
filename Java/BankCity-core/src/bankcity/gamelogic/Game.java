@@ -55,8 +55,8 @@ public class Game implements ContactListener, Inspectable {
 	
 	public static boolean debug = false;
 	
-	public double money = Double.POSITIVE_INFINITY;
-	public DefaultNumberAbbreviations abbreviations = new DefaultNumberAbbreviations(Language.DE);
+	public double money = 1000000000;
+	public DefaultNumberAbbreviations abbreviations = new DefaultNumberAbbreviations(Language.EN);
 	
 	private final Map<Achievement, Integer> achievements = new LinkedHashMap<>();
 
@@ -137,7 +137,7 @@ public class Game implements ContactListener, Inspectable {
 	}
 	
 	public String formatMoney(double money){
-		return StringFormatter.formatNumber(money, 0.01, abbreviations, 1);
+		return StringFormatter.formatNumber(money, "0.01", abbreviations, 1);
 	}
 	
 	public void executeAfterNextUpdate(Runnable runnable){
@@ -237,7 +237,7 @@ public class Game implements ContactListener, Inspectable {
 		table.add("Attractivity: ").left();
 		table.add(new DynamicLabel(new DynamicString(){
 			public String toString(){
-				return StringFormatter.formatNumber(resourceSystem.resources.get(Resource.ATTRACTIVITY), 0.01f);
+				return StringFormatter.formatNumber(resourceSystem.resources.get(Resource.ATTRACTIVITY), "0.01");
 			}
 		})).left();
 		
@@ -251,14 +251,14 @@ public class Game implements ContactListener, Inspectable {
 		table.add("Food: ").left();
 		table.add(new DynamicLabel(new DynamicString(){
 			public String toString(){
-				return StringFormatter.formatNumber(resourceSystem.foodImportExportYield, 1f);
+				return StringFormatter.formatNumber(resourceSystem.foodImportExportYield, "1");
 			}
 		})).left();
 		table.row();
 		table.add("Material: ").left();
 		table.add(new DynamicLabel(new DynamicString(){
 			public String toString(){
-				return StringFormatter.formatNumber(resourceSystem.materialImportExportYield, 1f);
+				return StringFormatter.formatNumber(resourceSystem.materialImportExportYield, "1");
 			}
 		})).left();
 		table.row();
@@ -267,7 +267,7 @@ public class Game implements ContactListener, Inspectable {
 		table.add(new DynamicLabel(new DynamicString(){
 			public String toString(){
 				if(resourceSystem.unsatisfied.get(Resource.WATER).isEmpty()){
-					return "overproduction (" + StringFormatter.formatNumber(resourceSystem.resources.get(Resource.WATER), 1f) + " l/h)";
+					return "overproduction (" + StringFormatter.formatNumber(resourceSystem.resources.get(Resource.WATER), "1") + " l/h)";
 				}else{
 					return "not enough";
 				}
@@ -288,7 +288,7 @@ public class Game implements ContactListener, Inspectable {
 		table.add(new DynamicLabel(new DynamicString(){
 			public String toString(){
 				if(resourceSystem.unsatisfied.get(Resource.ELECTRICITY).isEmpty()){
-					return "overproduction (" + StringFormatter.formatNumber(resourceSystem.resources.get(Resource.ELECTRICITY), 0.1f) + " MW/h)";
+					return "overproduction (" + StringFormatter.formatNumber(resourceSystem.resources.get(Resource.ELECTRICITY), "0.1") + " MW/h)";
 				}else{
 					return "not enough";
 				}

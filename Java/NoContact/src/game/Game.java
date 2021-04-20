@@ -243,6 +243,10 @@ public class Game implements GameInputListener {
 		graphics.setComposite(originalComposite);
 	}
 	
+	public long getTime() {
+		return gameTime;
+	}
+	
 	public String getTimeString() {
 		int minutes = (int) (gameTime / 1000 / 60);
 		int seconds = (int) (gameTime / 1000) - minutes * 60;

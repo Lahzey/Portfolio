@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class Text {
 	
-	public static Language LANG = Language.CH;
+	public static Language LANG = Language.EN;
 	public static final Language EN = Language.EN;
 	public static final Language DE = Language.DE;
 	public static final Language CH = Language.CH;

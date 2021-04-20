@@ -102,7 +102,7 @@ public class GameContainer extends MenuPanel implements AWTEventListener, MouseL
 		
 		if (game.gameOver && !gameOverMenu.isDisplayable()) {
 			removeAll();
-			timeLabel.setText("You survived for " + game.getTimeString() + " minutes");
+			timeLabel.setText("You survived for " + game.getTimeString() + " " + (game.getTime() >= 60000 ? "minutes" : "seconds"));
 			add(gameOverMenu);
 			revalidate();
 		}

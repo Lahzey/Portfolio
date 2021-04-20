@@ -25,7 +25,7 @@ public class ResourceSystem extends IntervalIteratingSystem{
 	private ComponentMapper<ResourceComponent> rm = ComponentMapper.getFor(ResourceComponent.class);
 	private ComponentMapper<ShopComponent> sm = ComponentMapper.getFor(ShopComponent.class);
 	
-	//Food and Material handling
+	// Food and Material handling
 	public long lastImportExportTime = 0;
 	
 	public static float FOOD_CONSUMPTION_PER_HABITANT = 1;
@@ -39,13 +39,13 @@ public class ResourceSystem extends IntervalIteratingSystem{
 	public float materialImportExportYield = 0f;
 	
 	
-	//general resource handling
+	// general resource handling
 	public Map<Resource, Float> resources = new HashMap<>();
 	public Map<Resource, Float> totalProduction = new HashMap<>();
 	public Map<Resource, Float> totalConsumption = new HashMap<>();
 	public Map<Resource, Float> retailCapacity = new HashMap<>();
 	
-	//resource producer / consumer
+	// resource producer / consumer
 	private List<Entity> queue = new ArrayList<>();
 	private List<Entity> waterCleaner = new ArrayList<>();
 	private List<ShopComponent> shopQueue = new ArrayList<>();
@@ -81,7 +81,7 @@ public class ResourceSystem extends IntervalIteratingSystem{
 		super.updateInterval();
 		setToZero();
 		
-		//production
+		// production
 		for(int i = 0; i < queue.size(); i++){
 			Entity entity = queue.get(i);
 			ResourceComponent producer = rm.get(entity);
@@ -97,7 +97,7 @@ public class ResourceSystem extends IntervalIteratingSystem{
 			}
 		}
 
-		//consumption
+		// consumption
 		for(int i = 0; i < queue.size(); i++){
 			Entity entity = queue.get(i);
 			ResourceComponent consumer = rm.get(entity);
@@ -112,7 +112,7 @@ public class ResourceSystem extends IntervalIteratingSystem{
 				float consumption = calc.getResult();
 				Float stock = resources.get(resource);
 				if(stock == null) stock = 0f;
-				if(consumption > stock && resource != Resource.ATTRACTIVITY){ //attractivity may go under 0 and should definitely not block consumption and production
+				if(consumption > stock && resource != Resource.ATTRACTIVITY){ // attractivity may go under 0 and should definitely not block consumption and production
 					float usage = (consumption > 0 ? stock / consumption : 1);
 					consumption = stock;
 					if(consumer.efficiencyMult > usage) consumer.efficiencyMult = usage;
@@ -124,7 +124,7 @@ public class ResourceSystem extends IntervalIteratingSystem{
 			}
 		}
 
-		//water cleaning
+		// water cleaning
 		for(Entity entity : waterCleaner){
 			ResourceComponent cleaner = rm.get(entity);
 			
@@ -145,7 +145,7 @@ public class ResourceSystem extends IntervalIteratingSystem{
 			totalConsumption.put(Resource.DIRTY_WATER, totalWaterCleaning + cleanAmount);
 		}
 		
-		//food and material handling
+		// food and material handling
 		float habitantCount = game.habitantSystem.habitants.size();
 		float yearsPassed = (game.timeSystem.date.days - lastImportExportTime) / GameDate.DAYS_PER_YEAR;
 		lastImportExportTime = game.timeSystem.date.days;
@@ -161,13 +161,15 @@ public class ResourceSystem extends IntervalIteratingSystem{
 		if(remainingFood > 0) game.money += remainingFood * foodExportPrice * yearsPassed;
 		else game.money += remainingFood * foodImportPrice * yearsPassed;
 		foodImportExportYield = remainingFood;
+		// TODO: handle food shortages
 		
 		if(remainingMaterial > 0) game.money += remainingMaterial * materialExportPrice * yearsPassed;
 		else game.money += remainingMaterial * materialImportPrice * yearsPassed;
 		materialImportExportYield = remainingMaterial;
+		// TODO: handle material shortages
 		
 
-		//shops
+		// shops
 		for(ShopComponent shop : shopQueue){
 			for(Resource resource : shop.offer.keySet()){
 				float offer = shop.offer.get(resource);
@@ -239,25 +241,25 @@ public class ResourceSystem extends IntervalIteratingSystem{
 	
 	public enum Resource{
 		
-		FOOD("Provides food for ", " People", 1),
-		WATER("liters / hour [clean water]", 0.1f),
-		DIRTY_WATER("liters / hour [clean water]", 0.1f),
-		ELECTRICITY("MW / hour", 0.01f),
-		MATERIAL("materials", 1), 
+		FOOD("Provides food for ", " People", "1"),
+		WATER("liters / hour [clean water]", "0.1"),
+		DIRTY_WATER("liters / hour [dirty water]", "0.1"),
+		ELECTRICITY("MW / hour", "0.01"),
+		MATERIAL("materials", "1"), 
 		
-		POSTAL_CAPACITY("Provides ", " Postal Capacity", 1),
-		HEALTH_CAPACITY("Provides Healthcare for ", " People", 1),
-		ATTRACTIVITY("Increases the attractivity of your town by " , "", 0.01f);
+		POSTAL_CAPACITY("Provides ", " Postal Capacity", "1"),
+		HEALTH_CAPACITY("Provides Healthcare for ", " People", "1"),
+		ATTRACTIVITY("Increases the attractivity of your town by " , "", "0.01");
 
 		private static final String PLACEHOLDER = "%RES%";
 		private String displayText;
-		private float formattingStep;
+		private String formattingStep;
 		
-		private Resource(String resourceName, float formattingStep){
+		private Resource(String resourceName, String formattingStep){
 			this("Produces ", " " + resourceName, formattingStep);
 		}
 		
-		private Resource(String before, String after, float formattingStep){
+		private Resource(String before, String after, String formattingStep){
 			displayText = before + PLACEHOLDER + after;
 			this.formattingStep = formattingStep;
 		}

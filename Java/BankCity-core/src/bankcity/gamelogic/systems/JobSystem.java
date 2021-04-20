@@ -47,7 +47,6 @@ public class JobSystem extends IntervalIteratingSystem{
 			
 			jobs.sort(jobComparator);
 			
-			jobLoop:
 			for(Job job : jobs){
 				if(job.onlyForSameBuilding && job.occupiedBy.size() < job.capacity){
 					HomeProviderComponent homeComp = job.workplace.getEntity().getComponent(HomeProviderComponent.class);
@@ -58,7 +57,7 @@ public class JobSystem extends IntervalIteratingSystem{
 								if(habitant.job == null){
 									setJob(habitant, job);
 								}
-								if(!(habitant.job.workplace == job.workplace && habitant.job.onlyForSameBuilding)){ //not already employed at this or similar jobs
+								if(!(habitant.job.workplace == job.workplace && habitant.job.onlyForSameBuilding)){ // not already employed at this building
 									setJob(habitant, job);
 								}
 							}
@@ -77,7 +76,7 @@ public class JobSystem extends IntervalIteratingSystem{
 								setJob(habitant, job);
 								habitants.remove(habitant);
 							}
-						}else break jobLoop;
+						}else break;
 					}
 				}
 			}
@@ -147,7 +146,7 @@ public class JobSystem extends IntervalIteratingSystem{
 		public int compare(Job o1, Job o2) {
 			return o1.priority - o2.priority;
 		}
-		
+
 	}
 
 }

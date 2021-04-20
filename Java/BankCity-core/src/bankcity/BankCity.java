@@ -10,12 +10,13 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 
 import bankcity.data.FileLocations;
+import bankcity.data.NameGenerator;
 import bankcity.data.TextureManager;
 import bankcity.ui.stages.InGameStage;
 import bankcity.ui.stages.LoadingStage;
 import bankcity.util.GameDate;
 
-public class BankCity extends Game{
+public class BankCity extends Game {
 	
 	public static TextureManager TEXTURE_MANAGER;
 	public static Skin SKIN;
@@ -35,6 +36,7 @@ public class BankCity extends Game{
 			@Override
 			public void run() {
 				GdxNativesLoader.load();
+				NameGenerator.init();
 				InGameStage inGameStage = new InGameStage(BankCity.this);
 				CURRENT_STAGE.dispose();
 				CURRENT_STAGE = inGameStage;
@@ -60,16 +62,16 @@ public class BankCity extends Game{
 	}
 	
 	public static GameDate getDate(){
-		if(CURRENT_STAGE instanceof InGameStage){
+		if(CURRENT_STAGE instanceof InGameStage) {
 			return ((InGameStage) CURRENT_STAGE).game.timeSystem.date;
 		}else return null;
 	}
 	
-	public static TextureRegion getImage(String internalPath){
+	public static TextureRegion getImage(String internalPath) {
 		return new TextureRegion(TEXTURE_MANAGER.getTexture(internalPath));
 	}
 	
-	public static TextureRegion getIcon(String name){
+	public static TextureRegion getIcon(String name) {
 		return new TextureRegion(TEXTURE_MANAGER.getTexture(FileLocations.ICONS + "/" + name));
 	}
 }

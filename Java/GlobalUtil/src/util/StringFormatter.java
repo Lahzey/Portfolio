@@ -1,5 +1,7 @@
 package util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -9,21 +11,28 @@ public class StringFormatter {
 	/**
 	 * Formats the given number by rounding it to the number closest to it that can be divided by the given step.
 	 * @param number the number to format
+	 * @param smallestStep the step (5.78, step: 0.2 -> 5.8) as string to avoid floating point errors
+	 * @return the formatted number as String
+	 */
+	public static String formatNumber(double number, String smallestStep){
+		if(Double.isInfinite(number)) return "Infinite";
+		else if(Double.isNaN(number)) return "NaN";
+		return formatNumber(new BigDecimal(number), new BigDecimal(smallestStep));
+	}
+
+	/**
+	 * Formats the given number by rounding it to the number closest to it that can be divided by the given step.
+	 * @param number the number to format
 	 * @param smallestStep the step (5.78, step: 0.2 -> 5.8)
 	 * @return the formatted number as String
 	 */
-	public static String formatNumber(double number, double smallestStep){
-		boolean negative = number < 0;
-		number = Math.abs(number);
-		long stepCount = Math.round(number / smallestStep);
-		double rounded = stepCount * smallestStep;
-		if(negative) rounded *= -1;
+	public static String formatNumber(BigDecimal number, BigDecimal smallestStep){
+		boolean negative = number.doubleValue() < 0;
+		number = number.abs();
+		BigDecimal stepCount = number.divide(smallestStep).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal rounded = stepCount.multiply(smallestStep);
+		if(negative) rounded = rounded.multiply(new BigDecimal(-1));
 		String formattedString = rounded + "";
-		String stepString = smallestStep + "";
-		int numbersAfterComma = stepString.length() - (stepString.indexOf(".") + 1);
-		int lastPossibleIndex = formattedString.indexOf(".") + numbersAfterComma;
-		if(formattedString.length() > lastPossibleIndex + 1) formattedString = formattedString.substring(0, lastPossibleIndex + 1);
-		formattedString = formattedString.replace(".0", "");
 		return formattedString;
 	}
 	
@@ -35,7 +44,7 @@ public class StringFormatter {
 	 * @param numberAbbreviations the suffixes to append
 	 * @return the formatted number as String
 	 */
-	public static String formatNumber(double number, double smallestStep, NumberAbbreviations numberAbbreviations){
+	public static String formatNumber(double number, String smallestStep, NumberAbbreviations numberAbbreviations){
 		return formatNumber(number, smallestStep, numberAbbreviations, 1);
 	}
 	
@@ -48,7 +57,7 @@ public class StringFormatter {
 	 * @param minDigitsBeforeComma the minimum amount of digits before the comma when choosing an abbreviation to make a large number smaller
 	 * @return the formatted number as String
 	 */
-	public static String formatNumber(double number, double smallestStep, NumberAbbreviations numberAbbreviations, int minDigitsBeforeComma){
+	public static String formatNumber(double number, String smallestStep, NumberAbbreviations numberAbbreviations, int minDigitsBeforeComma){
 		boolean negative = number < 0;
 		number = Math.abs(number);
 		if(minDigitsBeforeComma < 1) throw new IllegalArgumentException("minDigitsBeforeComma is " + minDigitsBeforeComma + " but cannot be smaller than 1");

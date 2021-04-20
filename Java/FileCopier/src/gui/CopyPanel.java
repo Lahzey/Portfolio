@@ -268,7 +268,7 @@ public class CopyPanel extends JPanel implements DocumentListener {
 					}
 					progressBar.setMaximum(fileCount);
 					progressBar.setValue(processedCount);
-					timeValue.setText(StringFormatter.formatNumber(seconds, 1) + " seconds");
+					timeValue.setText(StringFormatter.formatNumber(seconds, "1") + " seconds");
 					calcValue.setText("Processed: " + processedCount + "  |  Listed: " + fileCount);
 					speedValue.setText(StringFormatter.formatByteCount(bytesPerSec) + "/s");
 					copiedLabel.setText("Copied: " + successCount);
@@ -278,7 +278,7 @@ public class CopyPanel extends JPanel implements DocumentListener {
 					progressPanel.remove(cancelButton);
 					
 					timeLabel.setText("Copy " + (copyResults.get(0).cancelRequested ? "cancelled" : "completed") + " after:");
-					timeValue.setText(StringFormatter.formatNumber(seconds, 1) + " seconds");
+					timeValue.setText(StringFormatter.formatNumber(seconds, "1") + " seconds");
 					
 					progressBar.setValue(fileCount);
 					progressBar.setMaximum(fileCount);

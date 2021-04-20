@@ -57,7 +57,7 @@ public class FileProcessor {
 							System.out.println("Open Threads: " + threadCount);
 							System.out.println(StringFormatter.formatByteCount(bytesPerSec) + "/s");
 							if(result.finishedListing){
-								System.out.println(StringFormatter.formatNumber((result.successCount + result.failedCount) / (float) result.files.size() * 100, 0.1) + "%");
+								System.out.println(StringFormatter.formatNumber((result.successCount + result.failedCount) / (float) result.files.size() * 100, "0.1") + "%");
 							} else {
 								System.out.println("Calculating size...");
 								System.out.println("(Processed: " + (result.successCount + result.failedCount) + " | Listed: " + result.files.size() + ")");
@@ -112,7 +112,7 @@ public class FileProcessor {
 				if(printProgress){
 					long time = System.currentTimeMillis() - result.startTime;
 					double seconds = time / 1000d;
-					System.out.println("Copy complete after " + StringFormatter.formatNumber(seconds, 0.1) + " seconds");
+					System.out.println("Copy complete after " + StringFormatter.formatNumber(seconds, "0.1") + " seconds");
 					System.out.println("with an average speed of " + StringFormatter.formatByteCount((long) (result.totalByteCount / seconds)) + "/s");
 					System.out.println();
 					System.out.println("Processed " + result.files.size() +" files (" + StringFormatter.formatByteCount(result.totalByteCount) + ")");

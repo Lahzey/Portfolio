@@ -61,7 +61,9 @@ public class BuildingButton extends ImageButton{
 		});
 		textLabel.getStyle().font.getData().markupEnabled = true;
 		tooltip.add(textLabel).grow();
-		addListener(new Tooltip<Table>(tooltip));
+		Tooltip<Table> tooltipWrapper = new Tooltip<Table>(tooltip);
+		tooltipWrapper.setInstant(true);
+		addListener(tooltipWrapper);
 	}
 
 	@Override

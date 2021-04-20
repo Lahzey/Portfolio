@@ -36,7 +36,7 @@ public class BlockHouse extends SimpleHousingBuilding{
 
 	@Override
 	public String getName() {
-		return "Tower Block";
+		return "Ghetto Blocks";
 	}
 
 	@Override

@@ -87,7 +87,7 @@ public class SwingFrame extends JFrame implements AWTEventListener {
 	
 	private void setShowGame(boolean showGame) {
 		int componentIndex = showGame ? 1 : 0;
-		if (contentLayout.getCurrentComponentIndex() != componentIndex) {
+		if (contentLayout.getCurrentComponentIndex(contentPane) != componentIndex) {
 			contentLayout.swap(contentPane, showGame ? 1 : 0);
 		}
 	}

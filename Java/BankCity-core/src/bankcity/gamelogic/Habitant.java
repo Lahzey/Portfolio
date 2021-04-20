@@ -1,9 +1,12 @@
 package bankcity.gamelogic;
 
+import java.util.Random;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import bankcity.BankCity;
+import bankcity.data.NameGenerator;
 import bankcity.data.Text;
 import bankcity.gamelogic.buildings.Building;
 import bankcity.gamelogic.buildings.components.HomeProviderComponent;
@@ -16,9 +19,12 @@ import bankcity.util.ImageLabel.ImagePosition;
 
 public class Habitant implements Inspectable{
 	
-	public String prename = "Max";
-	public String surname = "Mustermann";
+	private static final Random RANDOM = new Random();
+
 	public GameDate bornAt;
+	public boolean female = RANDOM.nextBoolean();
+	public String prename = NameGenerator.generatePrename(female);
+	public String surname = NameGenerator.generateSurname();
 
 	public Building home;
 	public EducationLevel educationLevel = EducationLevel.UNEDUCATED;

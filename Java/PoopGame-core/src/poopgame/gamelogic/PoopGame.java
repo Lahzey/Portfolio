@@ -135,7 +135,6 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 
 	public void step(float deltaTime) {
 		if (server == null) {
-			System.out.println("no server set");
 			return;
 		}
 
@@ -275,6 +274,7 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 				server.dispatchAction(new ActionMessage(action));
 				synchronized (engine) {
 					engine.dispatchAction(action);
+//					action.execute(engine, engine.getEntityById(Player.generateIdForPlayer(action.getPlayerId())));
 				}
 			}
 		});
@@ -297,6 +297,7 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 			server.dispatchAction(new ActionMessage(action));
 			synchronized (engine) {
 				engine.dispatchAction(action);
+//				action.execute(engine, engine.getEntityById(Player.generateIdForPlayer(action.getPlayerId())));
 			}
 		});
 	}
@@ -310,6 +311,7 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 				server.dispatchAction(new ActionMessage(action));
 				synchronized (engine) {
 					engine.dispatchAction(action);
+//					action.execute(engine, engine.getEntityById(Player.generateIdForPlayer(action.getPlayerId())));
 				}
 			}
 		});
@@ -332,6 +334,7 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 			server.dispatchAction(new ActionMessage(action));
 			synchronized (engine) {
 				engine.dispatchAction(action);
+//				action.execute(engine, engine.getEntityById(Player.generateIdForPlayer(action.getPlayerId())));
 			}
 		});
 	}
@@ -344,6 +347,7 @@ public class PoopGame extends InputAdapter implements ContactListener, ActionRec
 
 		synchronized (engine) {
 			engine.dispatchAction(action);
+//			action.execute(engine, engine.getEntityById(Player.generateIdForPlayer(action.getPlayerId())));
 		}
 	}
 
