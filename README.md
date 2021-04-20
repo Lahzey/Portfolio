@@ -1,24 +1,39 @@
+Link zur Hausaufgabe: https://www.dropbox.com/s/sfwee9q3jmmd6fz/Vorkurs%20Aufgabe.pdf?dl=1
+
 Alle Desktop Applikationen können unter Releases gefunden werden. Java wird benötig (min. 1.8.0).
 
 - [Java](#java)
-  * [Hausaufgabe: No Contact](#hausaufgabe--no-contact)
+  * [Bank City](#bank-city)
+  * [No Contact](#no-contact)
     + [Technologie](#technologie)
     + [Assets](#assets)
   * [PoopGame](#poopgame)
     + [Meine Idee fürs Networking](#meine-idee-fürs-networking)
     + [Sonstige Entwicklung](#sonstige-entwicklung)
-  * [Bank City](#bank-city)
-  * [Sonstige Apps](#sonstige-apps)
 - [C#](#c-)
   * [Bloons TD 6 Assembly Browser](#bloons-td-6-assembly-browser)
 
 # Java
-## Hausaufgabe: No Contact
+
+## Bank City
+Dies war ein Spiel, das ich für die Schule entwickelt habe. Ich konnte es aber nie fertig stellen und war nach der Abgabe auch nich mehr motiviert daran weiterzuschaffen.
+Es ist ein City Builder (wie Cities Skylines oder SimCity), in dem man jedes Haus einzeln platziert.
+Alle Personen werden einzeln simuliert (haben / suchen einen Job und wohnen in einem Haus), jedoch hatte ich keine herumlaufende Menschen oder Strassen mit Autos.
+
+Nun habe ich das Spiel für das Portfolio wieder aufgenommen und weiter entwickelt.
+Ich habe immer noch keine spazierende Meschen oder fahrende Autos, da ich nicht sehr gut mit Animationen bin und auch keinen passenden Editor habe (ich benutze Paint.NET mit einem Plugin und bearbeite jedes Frame einzeln).
+
+Vom Gameplay her ist es sehr änlich wie existierende City Builder: Man versucht die Stadt stetig zu erweitern, ohne dass die Finanzen ins Rote gehen.
+
+## No Contact
+Da ich mich zuerst für ein Studium beworben habe, habe ich die diesjährige Hausaufgabe auch abgeschlossen:
 Passend zur momentanen Situation mit Corona habe ich ein Spiel gemacht, bei dem der Spieler verhindern muss, dass Personen sich zu nahe kommen.
 Es erscheinen ständig Personen auf der linken und oberen Seite und laufen auf die gegenüberliegende Seite. Der Spieler kann ihnen befehlen, dabei einen Umweg zu nehmen und muss so verhindern, dass sie sich in den Weg kommen.
 Falls sich Personen zu nahe kommen, kann es sein, dass sie Infiziert werden. Je mehr infizierte, desto höher diese Chance.
 Wenn die Infektionsrate 100% erreicht, ist das Spiel verloren. Das Ziel ist möglichst lange zu spielen, bevor dies passiert.
 Es gibt verschiedene vorgefertigte Schwierigkeitsstufen, es können aber alle Einstellungen auch einzeln verändert werden.
+
+Video: https://www.dropbox.com/s/9x3cukf6p7hzhop/NoContact.mp4?dl=1
 
 ### Technologie
 Aus Zeitgründen habe ich für das Spiel nur Native Java verwendet. Dargestellt wird das ganze in Swing Component und gezeichnet mit AWT Graphics.
@@ -33,11 +48,13 @@ Einige Assets werden während Runtime generiert oder abgeändert.
 
 
 ## PoopGame
-Dies ist ein Spiel das ich ursprünglich während eines 2 Wöchigen Kurses entwickelt habe.
+Dies ist ein Humor-Spiel, welches ich ursprünglich während eines 2 Wöchigen Kurses entwickelt habe.
 Das Prinzip ist simpel:
 Man kämpft in einer Arena gegen einen anderen Spieler, dem man Schaden zufügen kann wenn man ihn mit dem eigenen Kot trifft.
 Das spezielle hier ist, dass man den Kot nicht wirklich schiessen kann. Er übernimmt einfach die Geschwindigkeit des Spielers.
 Dies macht das Spiel schwieriger und die Spezialfähigkeiten der verschiedenen Charakteren sorgen für etwas Abwechslung.
+
+Video: https://www.dropbox.com/s/ufz6scct3r9qz67/PoopGame.mp4?dl=1
 
 Für dieses Portfolio habe ich dieses Spiel wieder aufgenommen und umgeschrieben. Dieses Mal wollte ich online Spiele ermöglichen.
 Zusätzlich wollte ich aber etwas ganz neues probieren:
@@ -75,26 +92,6 @@ Ich habe selbst kein Programm dafür und habe schlussendlich mit paint NET und e
 Die einzelnen Frames habe ich aus Bildern vom Internet zusammengestellt, da ich selbst nich gut genug im Zeichnen bin.
 
 Sounds hingegen waren viel simpler und sind grössten Teils selbst aufgenommen.
-
-## Bank City
-Dies war ein Spiel, das ich für die Schule entwickelt habe. Ich konnte es aber nie fertig stellen und war nach der Abgabe auch nich mehr motiviert daran weiterzuschaffen.
-Es ist ein City Builder (wie Cities Skylines oder SimCity), in dem man jedes Haus einzeln platziert.
-Alle Personen werden einzeln simuliert (haben / suchen einen Job und wohnen in einem Haus), jedoch hatte ich keine herumlaufende Menschen oder Strassen mit Autos.
-
-Ich denke, dass ich das Spiel an sich recht sauber geschrieben habe. Auch mit dem UI war ich recht zufrieden.
-Alle Grafiken habe ich selbst gemacht.
-Jedoch hatte ich Probleme mit den Resourcen:
-Ich wollte, dass einige Gebäude Resourcen Produzieren, aber auch konsumieren. Zum Beispiel produziert ein Kraftwerk Strom und konsumiert Wasser.
-Wenn nur 50% vom gebrauchten Wasser vorhanden ist, ist der Strom Output auch nur 50%. Hier lag aber das Problem:
-Nun war es möglich, dass Wasserpumpen auch nur noch einen Bruchteil produzieren, weil sie nicht mehr genug Strom haben. Dies senkt wiederum die Strom Produktion. Dies würde theoretisch endlos weitergehen.
-Generell war dieser Kreis von Abhänigkeiten ein Problem, dass ich damals nicht lösen konnte.
-In der Zwischenzeit habe ich realisiert, dass das System mit nur teilweis Produktiven Gebäuden nicht wirklich machbar ist. In anderen Spielen fällt ein Gebäude bei Mängeln einfach komplett aus.$
-
-Wenn ich mal Zeit habe würde ich gerne das Spiel fertig entwickeln, da ich an sich ein Stabiles Framework aufgebaut habe (das Hinzufügen von neuen Gebäuden war extrem einfach) und es schde ist, dass ich dies nicht wirklich ausnutzen konnte.
-
-## Sonstige Apps
-Ich habe sonst noch Applikationen gemacht, die ich für die Arbeit brauchen konnte (hat nichts mit Games zu tun).
-Diese sind auch bei den Releases zu finden.
 
 # C#
 ## Bloons TD 6 Assembly Browser
